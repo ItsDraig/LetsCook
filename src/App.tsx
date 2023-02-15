@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 import RecipeCard from './RecipeCard'
 import SearchIcon from './search.svg'
+import Pantry from './components/Pantry';
 
 const API_URL = 'https://api.spoonacular.com/recipes/complexSearch?apiKey=eec512c1c7924522aa6a293a7a73a893'
 
@@ -40,6 +41,10 @@ const App = () => {
   return (
     <div className="app">
       <h1>Lets Cook!</h1>
+
+      <div className="pantry">
+        <Pantry />
+      </div>
 
       <div className="search">
         <input
