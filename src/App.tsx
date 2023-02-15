@@ -26,7 +26,7 @@ const App = () => {
   const [recipes, setRecipes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const searchRecipes = async (title) => { 
+  const searchRecipes = async (title: string) => { 
     const response = await fetch(`${API_URL}&query=${title}`);
     const data = await response.json();
 

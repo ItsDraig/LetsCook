@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { applicationDefault, cert } from 'firebase-admin/app';
+import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -19,3 +21,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// Get a list of cities from your database
+async function getCities(db: any) {
+    const citiesCol = collection(db, 'cities');
+    const citySnapshot = await getDocs(citiesCol);
+    const cityList = citySnapshot.docs.map((doc: { data: () => any; }) => doc.data());
+    return cityList;
+}

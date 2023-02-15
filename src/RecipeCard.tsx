@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCard = ({recipe} : {recipe:any}) => {
     return (
         <div className="recipe">
           <div>
