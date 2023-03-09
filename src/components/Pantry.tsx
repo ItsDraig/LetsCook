@@ -2,8 +2,10 @@ import React, {useState} from 'react'
 import Ingredient from './Ingredient';
 import PantryForm from './PantryForm'
 
-function Pantry() {
+function Pantry()
+{
     const [ingredients, setIngredients] = useState<any[]>([])
+    const [edit, setEdit] = useState({ id: null, value: ''})
 
     const addIngredient = (ingredient: { text: string; }) => {
       if(!ingredient.text || /^\s*$/.test(ingredient.text)) {
@@ -45,7 +47,7 @@ function Pantry() {
     return (
       <div>
         <h2>My Pantry</h2>
-        <PantryForm onSubmit={addIngredient}/>
+        <PantryForm edit={edit} onSubmit={addIngredient}/>
         <Ingredient
         ingredients={ingredients}
         finishIngredient={finishIngredient}

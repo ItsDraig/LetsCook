@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { applicationDefault, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,13 +21,64 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
+const analytics = getAnalytics(app);        // Google Analytics
+const db = getFirestore(app);               // Cloud Firestore Database
+const auth = getAuth(app);                  // User Authentication
 
-// Get a list of cities from your database
-async function getCities(db: any) {
-    const citiesCol = collection(db, 'cities');
-    const citySnapshot = await getDocs(citiesCol);
-    const cityList = citySnapshot.docs.map((doc: { data: () => any; }) => doc.data());
-    return cityList;
+const email = "test";
+const password = "pass";
+
+// Checks if there is a currently signed in user
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    const uid = user.uid;
+    // ...
+  } else {
+    // User is signed out
+    // ...
+  }
+});
+
+// Signs out a user
+signOut(auth).then(() => {
+  // Sign-out successful.
+}).catch((error) => {
+  // An error happened.
+});
+
+// Creates a new user profile from username and password
+// TODO: Verify fields
+createUserWithEmailAndPassword(auth, email, password)
+.then((userCredential) => {
+  // Signed in 
+  const user = userCredential.user;
+  // ...
+})
+.catch((error) => {
+  const errorCode = error.code;
+  const errorMessage = error.message;
+  // ..
+});
+
+// Signs in user from username and password
+// TODO: Verify fields
+signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+  });
+
+// Get a list of users from the database
+async function getUserRecipes(db: any) {
+    const recipeCol = collection(db, 'recipes');
+    const recipeSnapshot = await getDocs(recipeCol);
+    const recipeList = recipeSnapshot.docs.map((doc: { data: () => any; }) => doc.data());
+    return recipeList;
 }
