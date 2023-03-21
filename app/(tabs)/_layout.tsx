@@ -83,8 +83,21 @@ export default function TabLayout() {
         name="five"
         options={{
           title: 'Pantry',
-          tabBarIcon: ({ color }) => 
-            <TabBarIcon name="archive" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="archive" color={color} />,
+          headerRight: () => (
+            <Link href="/add_ingredient" asChild> 
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="plus-circle"
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
         }}
       />
     </Tabs>

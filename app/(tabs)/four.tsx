@@ -15,7 +15,7 @@ export default function TabFourScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Recipes</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text> {noRecipeText}
+      <Text style={styles.bodyText}> {noRecipeText}
         <Text style={styles.boldText}>{search}</Text>
         {noRecipeTextCont}
       </Text>
@@ -35,6 +35,11 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: 'bold',
+  },
+  bodyText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center'
   },
   separator: {
     marginVertical: 30,

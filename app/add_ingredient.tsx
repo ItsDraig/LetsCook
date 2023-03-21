@@ -1,30 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, Platform, StyleSheet, TextInput } from 'react-native';
+import { SafeAreaView, Platform, StyleSheet, TextInput, Pressable } from 'react-native';
 import React from 'react';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 
-export default function AddRecipeScreen() {
+export default function AddIngredientScreen() {
   const [text, onChangeText] = React.useState('Useless Text'); 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Recipe</Text>
+      <Text style={styles.title}>Add Ingredient</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <SafeAreaView>
         <TextInput style={styles.input} 
         onChangeText={onChangeText}
-        placeholder="Recipe Name"
+        placeholder="Ingredient Name"
         />
         <TextInput style={styles.input} 
         onChangeText={onChangeText}
-        placeholder="Prep Time (minutes)"
+        placeholder="Quantity (optional)"
         keyboardType="numeric"
         />
-        <TextInput style={styles.input} 
-        onChangeText={onChangeText}
-        placeholder="Cook Time (minutes)"
-        keyboardType="numeric"
-        />
+        <Pressable style={styles.input}>
+            <Text>Add Ingredient</Text>
+        </Pressable>
       </SafeAreaView>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
