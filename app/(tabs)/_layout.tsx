@@ -64,7 +64,7 @@ export default function TabLayout() {
           title: 'Recipes',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild> 
+            <Link href="/add_recipe" asChild> 
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
