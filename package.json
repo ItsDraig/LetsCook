@@ -1,47 +1,44 @@
 {
   "name": "letscook",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.12",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@types/react-icons": "^3.0.0",
-    "firebase": "^9.17.1",
-    "firebase-admin": "^11.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^4.7.1",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
-  },
+  "version": "1.0.0",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "test": "jest --watchAll"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "jest": {
+    "preset": "jest-expo"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@expo/vector-icons": "^13.0.0",
+    "@mui/material": "^5.11.13",
+    "@react-navigation/native": "^6.0.2",
+    "expo": "~48.0.6",
+    "expo-font": "~11.1.1",
+    "expo-linking": "~4.0.1",
+    "expo-router": "^1.0.0-rc5",
+    "expo-splash-screen": "~0.18.1",
+    "expo-status-bar": "~1.4.4",
+    "expo-system-ui": "~2.2.1",
+    "expo-web-browser": "~12.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.71.3",
+    "react-native-safe-area-context": "4.5.0",
+    "react-native-screens": "~3.20.0",
+    "react-native-web": "~0.18.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.0.14",
+    "jest": "^29.2.1",
+    "jest-expo": "~48.0.0",
+    "react-test-renderer": "18.2.0",
+    "typescript": "^4.9.4"
+  },
+  "private": true
 }
