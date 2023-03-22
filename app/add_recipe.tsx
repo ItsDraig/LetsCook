@@ -10,11 +10,6 @@ export default function AddRecipeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add Recipe</Text>
-      <br></br><br></br>
-      <Stack direction="row" spacing={3}>
-        <Button variant="outlined" color='primary'>Clear</Button>
-        <Button variant="outlined" color="secondary">Add Recipe</Button>
-      </Stack>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <SafeAreaView>
         <TextInput style={styles.input} 
@@ -31,6 +26,11 @@ export default function AddRecipeScreen() {
         placeholder="Cook Time (minutes)"
         keyboardType="numeric"
         />
+        <br></br><br></br>
+      <Stack direction="row" spacing={3}>
+        <Button variant="outlined" color='primary'>Clear</Button>
+        <Button variant="outlined" color="secondary">Add Recipe</Button>
+      </Stack>
       </SafeAreaView>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
