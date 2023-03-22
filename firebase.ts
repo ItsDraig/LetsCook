@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { applicationDefault, cert } from 'firebase-admin/app';
-import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs, DocumentData, QueryDocumentSnapshot, SnapshotOptions, doc, getDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -75,10 +75,56 @@ signInWithEmailAndPassword(auth, email, password)
     const errorMessage = error.message;
   });
 
-// Get a list of users from the database
-async function getUserRecipes(db: any) {
-    const recipeCol = collection(db, 'recipes');
-    const recipeSnapshot = await getDocs(recipeCol);
-    const recipeList = recipeSnapshot.docs.map((doc: { data: () => any; }) => doc.data());
-    return recipeList;
+// Gets a list of recipes all from the database
+async function getRecipes(db: any) {
+  const recipeList: RecipeCard[] = [];
+  const ref = collection(db, 'recipes').withConverter(recipeConverter);
+  const querySnapshot = await getDocs(ref);
+  querySnapshot.forEach((doc) => {
+    const recipe = doc.data();
+    recipeList.push(recipe);
+    console.log(recipe.name);
+  });
+  return recipeList;
 }
+
+// Adds a new recipe to the database
+async function addRecipe(newRecipe: RecipeCard) {
+  try {
+    const docRef = await addDoc(collection(db, 'recipes'), {
+      name: newRecipe.name,
+      thumbnail: newRecipe.thumbnail,
+      preptime: newRecipe.preptime,
+      cooktime: newRecipe.cooktime,
+      totaltime: newRecipe.totaltime,
+      servings: newRecipe.servings,
+      images: newRecipe.images,
+      ingredients: newRecipe.ingredients,
+      instructions: newRecipe.instructions
+    });
+    console.log("Recipe added with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding recipe: ", e);
+  }
+}
+
+// RecipeCard converter function for Firestore
+const recipeConverter = {
+  toFirestore(recipe: RecipeCard): DocumentData {
+    return {
+      name: recipe.name,
+      thumbnail: recipe.thumbnail,
+      preptime: recipe.preptime,
+      cooktime: recipe.cooktime,
+      totaltime: recipe.totaltime,
+      servings: recipe.servings,
+      images: recipe.images,
+      ingredients: recipe.ingredients,
+      instructions: recipe.instructions,
+    }
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    const data = snapshot.data(options);
+    return new RecipeCard(data.name, data.thumbnail, data.preptime, data.cooktime, data.totaltime, data.servings, data.images, data.ingredients, data.instructions);
+  }
+};

@@ -3,12 +3,18 @@ import { SafeAreaView, Platform, StyleSheet, TextInput } from 'react-native';
 import React from 'react';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import { Stack, Button} from '@mui/material';
 
 export default function AddRecipeScreen() {
   const [text, onChangeText] = React.useState('Useless Text'); 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add Recipe</Text>
+      <br></br><br></br>
+      <Stack direction="row" spacing={3}>
+        <Button variant="outlined" color='primary'>Clear</Button>
+        <Button variant="outlined" color="secondary">Add Recipe</Button>
+      </Stack>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <SafeAreaView>
         <TextInput style={styles.input} 
