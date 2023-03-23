@@ -1,6 +1,8 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
+import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
+import { COLORS, icons, images, SIZES } from '../../constants';
 import Badge from '@mui/material/Badge';
 import Colors from '../../constants/Colors';
 
@@ -27,7 +29,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-          headerRight: () => (
+          headerLeft: () => (
             <Link href="/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
@@ -35,11 +37,15 @@ export default function TabLayout() {
                     name="info-circle"
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                    style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
               </Pressable>
             </Link>
+          ),
+          //replace with Pressable 
+          headerRight: () => (
+            <ScreenHeaderBtn iconUrl={images.profile} dimension="100%" handlePress={undefined} />
           ),
         }}
       />

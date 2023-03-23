@@ -3,6 +3,8 @@ import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import { Platform } from 'react-native';
 
+// Use this for navigating to full recipe
+
 export function ExternalLink(props: React.ComponentProps<typeof Link>) {
   return (
     <Link
