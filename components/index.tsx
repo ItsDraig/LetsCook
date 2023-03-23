@@ -13,7 +13,7 @@ import { default as JobFooter } from "./jobdetails/footer/Footer";
 import Specifics from "./jobdetails/specifics/Specifics";
 
 // common
-import NearbyJobCard from "./common/cards/nearby/NearbyJobCard";
+import NearbyJobCard from "./common/cards/favorite/FavoriteRecipeCard";
 
 export {
   ScreenHeaderBtn,
