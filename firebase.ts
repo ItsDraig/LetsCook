@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { applicationDefault, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs, DocumentData, QueryDocumentSnapshot, SnapshotOptions, doc, getDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { RecipeCard } from "./RecipeCard";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -76,7 +77,7 @@ signInWithEmailAndPassword(auth, email, password)
   });
 
 // Gets a list of recipes all from the database
-async function getRecipes(db: any) {
+export async function GetRecipes(db: any) {
   const recipeList: RecipeCard[] = [];
   const ref = collection(db, 'recipes').withConverter(recipeConverter);
   const querySnapshot = await getDocs(ref);
@@ -89,7 +90,7 @@ async function getRecipes(db: any) {
 }
 
 // Adds a new recipe to the database
-async function addRecipe(newRecipe: RecipeCard) {
+export async function AddRecipe(newRecipe: RecipeCard) {
   try {
     const docRef = await addDoc(collection(db, 'recipes'), {
       name: newRecipe.name,
