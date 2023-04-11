@@ -50,14 +50,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="search"
         options={{
           title: 'Search',
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="three"
+        name="lets-cook"
         options={{
           title: 'Lets Cook!',
           tabBarBadge: 5,
@@ -65,7 +65,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="four"
+        name="recipes"
         options={{
           title: 'Recipes',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
@@ -86,7 +86,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="five"
+        name="pantry"
         options={{
           title: 'Pantry',
           tabBarIcon: ({ color }) => <TabBarIcon name="archive" color={color} />,

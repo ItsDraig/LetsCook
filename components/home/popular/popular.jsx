@@ -8,7 +8,7 @@ import PopularRecipeCard from '../../common/cards/popular/PopularRecipeCard';
 
 const Popular = () => {
   const router = useRouter();
-  const isLoading = true;
+  const isLoading = false;
   const error = false;
 
   return (

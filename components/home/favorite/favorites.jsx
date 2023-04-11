@@ -5,13 +5,23 @@ import { useRouter } from 'expo-router'
 import styles from './favorites.style'
 import { COLORS, SIZES } from '../../../constants';
 import FavoriteRecipeCard from '../../common/cards/favorite/FavoriteRecipeCard';
+import { NearbyJobCard } from '../..';
 
 const Favorite = () => {
   const router = useRouter();
+  const data = null;
+  /*
+  const { data, isLoading, errpr } = useFetch
+  ('search', {
+    query: 'Pizza spring rolls',
+    num_pages: 1
+  })
+  */
   const isLoading = false;
   const error = false;
   
   return (
+    
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Favorite Recipes</Text>
@@ -26,17 +36,16 @@ const Favorite = () => {
         ) : error ? (
           <Text>Something went wrong</Text>
         ) : (
-          <FlatList
-            data={[1,2,3,4]}
-            renderItem={({item}) => (
-              <FavoriteRecipeCard
-                item={item}
-              />
-            )}
-            keyExtractor={item => item?.recipe_id}
-            contentContainerStyle={{ columnGap: SIZES.medium }}
-            horizontal
-          />)}
+            data?.map((job) => (
+              <NearbyJobCard
+                job={job}
+                key={`nearby-job-${job?.job_id}`}
+                handleNavigate={() => router.push(`/job-details/${job.job_id}`)}
+              >
+              </NearbyJobCard>
+
+            ))
+          )}
       </View>
     </View>
   )
