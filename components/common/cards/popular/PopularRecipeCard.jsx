@@ -12,7 +12,7 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
       <TouchableOpacity style={styles.logoContainer(selectedRecipe, item)}>
         <Image
           source={{ uri: item.thumbnail }}
-          resizeMode="contain"
+          resizeMode="cover"
           style={styles.logoImage}
         />
       </TouchableOpacity>

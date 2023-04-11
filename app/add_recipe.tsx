@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, Platform, StyleSheet, TextInput } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { Stack, Button } from "@react-native-material/core";
@@ -8,7 +8,94 @@ import { AddRecipe } from '../firebase';
 import { RecipeCard } from '../RecipeCard';
 
 export default function AddRecipeScreen() {
-  const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: ''});
+  const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']});
+  const [isIngredientInputClicked, setIsIngredientInputClicked] = useState(false);
+  const [isInstructionInputClicked, setIsInstructionInputClicked] = useState(false);
+  const [numIngredients, setNumIngredients] = useState(1);
+  const [ingredients, setIngredients] = useState(['']);
+  const [numInstructions, setNumInstructions] = useState(1);
+  const [instructions, setInstructions] = useState(['']);
+
+  const handleIngredientInputFocus = () => {
+    setIsIngredientInputClicked(true);
+  };
+
+  const handleIngredientInputBlur = () => {
+    setTimeout(function() {
+      setIsIngredientInputClicked(false);
+    }, 150);
+  };
+
+  const handleInstructionInputFocus = () => {
+    setIsInstructionInputClicked(true);
+  };
+
+  const handleInstructionInputBlur = () => {
+    setTimeout(function() {
+      setIsInstructionInputClicked(false);
+    }, 150);
+  };
+
+  const handleAddIngredient = () => {
+    setNumIngredients(numIngredients + 1);
+    setIngredients([...ingredients, '']);
+  };
+
+  const handleAddInstruction = () => {
+    setNumInstructions(numInstructions + 1);
+    setInstructions([...instructions, '']);
+  };
+
+  const handleIngredientChange = (text: string, index: number) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index] = text;
+    setRecipeData({...recipe, ingredients: newIngredients});
+    setIngredients(newIngredients);
+  };
+
+  const handleInstructionChange = (text: string, index: number) => {
+    const newInstructions = [...instructions];
+    newInstructions[index] = text;
+    setRecipeData({...recipe, instructions: newInstructions});
+    setInstructions(newInstructions);
+  };
+
+  const renderIngredients = () => {
+    const inputComponents = [];
+    for (let i = 0; i < numIngredients; i++) {
+      inputComponents.push(
+        <TextInput
+          style={styles.input}
+          key={i}
+          value={recipe.ingredients[i]}
+          onChangeText={(text) => handleIngredientChange(text, i)}
+          placeholder={`Ingredient ${i + 1}`}
+          onFocus={handleIngredientInputFocus}
+          onBlur={handleIngredientInputBlur}
+        />
+      );
+    }
+    return inputComponents;
+  };
+
+  const renderInstructions = () => {
+    const inputComponents = [];
+    for (let i = 0; i < numInstructions; i++) {
+      inputComponents.push(
+        <TextInput
+          style={styles.input}
+          key={i}
+          value={recipe.instructions[i]}
+          onChangeText={(text) => handleInstructionChange(text, i)}
+          placeholder={`Instruction ${i + 1}`}
+          onFocus={handleInstructionInputFocus}
+          onBlur={handleInstructionInputBlur}
+        />
+      );
+    }
+    return inputComponents;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add Recipe</Text>
@@ -37,8 +124,19 @@ export default function AddRecipeScreen() {
         placeholder="Servings (number)"
         keyboardType="numeric"
         />
-        <Stack direction="row" spacing={10}>
-          <Button onPress={() => setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: ''})} title="Clear" variant="contained" color='primary'/>
+        
+        <View style={{ margin: 5}}>
+          {renderIngredients()}
+          <Button title="Add ingredient" onPress={handleAddIngredient} disabled={!isIngredientInputClicked}/>
+        </View>
+
+        <View style={{ margin: 5}}>
+          {renderInstructions()}
+          <Button title="Add step" onPress={handleAddInstruction} disabled={!isInstructionInputClicked}/>
+        </View>
+        
+        <Stack direction="row" spacing={10} style={{ marginTop: 20}}>
+          <Button onPress={() => setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']})} title="Clear" variant="contained" color='primary'/>
           <Button onPress={() => onPressAddRecipe(recipe)} title="Add Recipe" variant="contained" color="secondary"/>
         </Stack>
       </SafeAreaView>
@@ -58,7 +156,7 @@ function onPressAddRecipe(newRecipe: any)
 {
   console.log("Adding recipe to firebase database");
   let recipe = new RecipeCard(newRecipe.recipeName, '', parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
-  parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), parseInt(newRecipe.servings));
+  parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), parseInt(newRecipe.servings), [''], newRecipe.ingredients, newRecipe.instructions);
   AddRecipe(recipe);
 }
 
