@@ -77,7 +77,7 @@ signInWithEmailAndPassword(auth, email, password)
   });
 
 // Gets a list of recipes all from the database
-export async function GetRecipes(db: any) {
+export async function GetRecipes() {
   const recipeList: RecipeCard[] = [];
   const ref = collection(db, 'recipes').withConverter(recipeConverter);
   const querySnapshot = await getDocs(ref);

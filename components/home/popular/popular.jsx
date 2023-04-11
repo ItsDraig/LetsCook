@@ -1,6 +1,8 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
+import { GetRecipes } from '../../../firebase'
+import { RecipeCard } from '../../../RecipeCard'
 
 import styles from './popular.style'
 import { COLORS, SIZES } from '../../../constants';
@@ -8,8 +10,17 @@ import PopularRecipeCard from '../../common/cards/popular/PopularRecipeCard';
 
 const Popular = () => {
   const router = useRouter();
-  const isLoading = false;
+  var isLoading = false;
   const error = false;
+  const [recipeList, setRecipeList] = React.useState();
+
+  if(recipeList == null) getRecipesFromDB();
+  async function getRecipesFromDB() {
+    console.log("Getting recipes from DB");
+    var recipes = await GetRecipes();
+    isLoading = false;
+    setRecipeList(recipes);
+  }
 
   return (
     <View style={styles.container}>
@@ -27,13 +38,9 @@ const Popular = () => {
           <Text>Something went wrong</Text>
         ) : (
           <FlatList
-            data={[1,2,3,4]}
-            renderItem={({item}) => (
-              <PopularRecipeCard
-                item={item}
-              />
-            )}
-            keyExtractor={item => item?.recipe_id}
+            data={recipeList}
+            renderItem={({item}) => <PopularRecipeCard item={item}/>}
+            keyExtractor={item => item?.name}
             contentContainerStyle={{ columnGap: SIZES.medium }}
             horizontal
           />)}

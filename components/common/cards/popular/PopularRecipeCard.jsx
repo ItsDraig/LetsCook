@@ -11,20 +11,24 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
     >
       <TouchableOpacity style={styles.logoContainer(selectedRecipe, item)}>
         <Image
-          source={{ uri: item.recipe_image }}
+          source={{ uri: item.thumbnail }}
           resizeMode="contain"
           style={styles.logoImage}
         />
       </TouchableOpacity>
-      <Text style={styles.companyName} numberOfLines={1}>{item.recipe_type}</Text>
+      <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
 
       <View style={styles.infoContainer}>
         <Text style={styles.jobName(selectedRecipe, item)} numberOfLines={1}>
-          {item.recipe_name}
+          {item.name}
         </Text>
       </View>
     </TouchableOpacity>
   )
+
+  function handleCardPress(item) {
+    console.log(item.name);
+  }
 }
 
 export default PopularRecipeCard
