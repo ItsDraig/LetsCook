@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Platform, StyleSheet, TextInput, Button, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
-
-import SQLite, { ResultSet } from 'react-native-sqlite-storage';
+import * as SQLite from 'expo-sqlite';
 import { ActivityIndicator } from '@react-native-material/core';
+import { SQLError } from 'expo-sqlite';
 
 interface Ingredient {
   id: number;
@@ -13,83 +13,53 @@ interface Ingredient {
   quantity: string;
 }
 
-const db = SQLite.openDatabase({name: 'mydb.db', location: 'default'});
+const db = SQLite.openDatabase('ingredients.db');
 
 export default function AddIngredientScreen() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
-  getIngredientsFromDB();
-  async function getIngredientsFromDB() {
-    (await db).transaction((tx) => {
-      tx.executeSql('SELECT * FROM ingredients', []).then(([tx, results]) => {
-        const rows = results.rows.raw();
-        setIngredients(rows);
-        setLoading(false);
-      });
-    });
-  }
-
-  async function addIngredientsToDB() {
-    const newIngredient: Ingredient = {
-      id: Date.now(),
-      name,
-      quantity,
-    };
-    (await db).transaction((tx) => {
+  const handleAddIngredient = () => {
+    db.transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO ingredients (id, name, quantity) VALUES (?, ?, ?)',
-        [newIngredient.id, newIngredient.name, newIngredient.quantity],
-      ).then(([tx, results]) => {
-        setIngredients([...ingredients, newIngredient]);
-        setName('');
-        setQuantity('');
-      });
+        'INSERT INTO ingredients (name, quantity) values (?, ?)',
+        [name, quantity],
+        (_, { rowsAffected, insertId }) => {
+          if (rowsAffected > 0) {
+            console.log(`Ingredient added with ID: ${insertId}`);
+            const newIngredient = { id: insertId || 0, name, quantity };
+            setIngredients([...ingredients, newIngredient]);
+            setName('');
+            setQuantity('');
+          }
+        }
+      );
     });
-  }
-
-  const handleSubmit = () => {
-    addIngredientsToDB();   
   };
-
-  if (loading) {
-    return <ActivityIndicator />;
-  }
+  
 
   return (
-    
-    <View style={styles.container}>
-      <Text style={styles.title}>Ingredients</Text>
-      
-      {ingredients.length ? (
-        ingredients.map((ingredient) => (
-          <Text key={ingredient.id}>
-            {ingredient.name} - {ingredient.quantity}
-          </Text>
-        ))
-      ) : (
-        <Text>No ingredients found</Text>
-      )}
-        <TextInput style={styles.input} 
-        onChangeText={setName}
-        placeholder="Ingredient Name"
-        value={name}
+    <View style={{ flex: 1, padding: 20 }}>
+      <View style={{ marginBottom: 20, marginTop: 20 }}>
+        <Text>Add Ingredient</Text>
+        <TextInput
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+          style={{ borderWidth: 1, borderColor: '#ccc', padding: 10 }}
         />
-        <TextInput style={styles.input} 
-        onChangeText={setQuantity}
-        placeholder="Quantity"
-        value={quantity}
-        keyboardType="numeric"
+        <TextInput
+          placeholder="Quantity"
+          value={quantity}
+          onChangeText={setQuantity}
+          style={{ borderWidth: 1, borderColor: '#ccc', padding: 10 }}
         />
-        <TouchableOpacity onPress={handleSubmit}>
-          <Text>Add</Text>
-        </TouchableOpacity>
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+        <Button title="Add" onPress={handleAddIngredient} />
+      </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
