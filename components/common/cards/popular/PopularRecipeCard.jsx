@@ -1,8 +1,7 @@
-import { React, useState, useRef, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Image, Animated, Easing, StyleSheet } from 'react-native'
+import { React, useState, useRef } from 'react'
+import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
 import styles from './popularrecipecard.style'
-import zIndex from '@mui/material/styles/zIndex';
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
 
@@ -66,27 +65,6 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
     setSize(size + 10);
     setIsEnlarged(false);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        if (isEnlarged) {
-          resetSize();
-        }
-      }
-    };
-
-    const subscription = containerRef.current && containerRef.current.addEventListener(
-      'touchstart',
-      handleClickOutside
-    );
-
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('touchstart', handleClickOutside);
-      }
-    };
-  }, [isEnlarged]);
 
   return (
     <TouchableOpacity 
