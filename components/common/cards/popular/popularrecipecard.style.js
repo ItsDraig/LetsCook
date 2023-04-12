@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     width: "97%",
     height: "98%",
     borderRadius: 15,
+    resizeMode: "cover",
   },
   companyName: {
     fontSize: SIZES.medium,

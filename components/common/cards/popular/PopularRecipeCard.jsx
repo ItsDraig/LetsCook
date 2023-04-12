@@ -1,19 +1,107 @@
-import React from 'react'
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { React, useState, useRef, useEffect } from 'react'
+import { View, Text, TouchableOpacity, Image, Animated, Easing, StyleSheet } from 'react-native'
 
 import styles from './popularrecipecard.style'
+import zIndex from '@mui/material/styles/zIndex';
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
+
+  const [size, setSize] = useState(85);
+  const [isEnlarged, setIsEnlarged] = useState(false);
+  const scaleAnimation = useRef(new Animated.Value(1)).current;
+  const translateXAnimation = useRef(new Animated.Value(0)).current;
+  const translateYAnimation = useRef(new Animated.Value(0)).current;
+  const containerRef = useRef(null);
+
+  const animateSize = () => {
+    Animated.parallel([
+      Animated.timing(scaleAnimation, {
+        toValue: 2.5,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: false,
+      }),
+      Animated.timing(translateXAnimation, {
+        toValue: size * 0.7,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: false,
+      }),
+      Animated.timing(translateYAnimation, {
+        toValue: size * 0.45,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      //setSize(size + 50);
+    });
+    setSize(size - 10);
+    setIsEnlarged(true);
+  };
+
+  const resetSize = () => {
+    Animated.parallel([
+      Animated.timing(scaleAnimation, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: false,
+      }),
+      Animated.timing(translateXAnimation, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: false,
+      }),
+      Animated.timing(translateYAnimation, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      //setSize(size - 50);
+    });
+    setSize(size + 10);
+    setIsEnlarged(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        if (isEnlarged) {
+          resetSize();
+        }
+      }
+    };
+
+    const subscription = containerRef.current && containerRef.current.addEventListener(
+      'touchstart',
+      handleClickOutside
+    );
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('touchstart', handleClickOutside);
+      }
+    };
+  }, [isEnlarged]);
+
   return (
     <TouchableOpacity 
-    style={styles.container(selectedRecipe, item)}
+    style={styles.container(selectedRecipe, item)} ref={containerRef}
     onPress={() => handleCardPress(item)}
     >
-      <TouchableOpacity style={styles.logoContainer(selectedRecipe, item)}>
-        <Image
+      <TouchableOpacity style={[styles.logoContainer(selectedRecipe, item), {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
+        <Animated.Image
           source={{ uri: item.thumbnail }}
-          resizeMode="cover"
-          style={styles.logoImage}
+          style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
+            transform: [
+              { translateX: translateXAnimation },
+              { translateY: translateYAnimation },
+              { scale: scaleAnimation },
+            ],}]}
         />
       </TouchableOpacity>
       <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
@@ -30,5 +118,18 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
     console.log(item.name);
   }
 }
+
+const stylesAnimate = StyleSheet.create({
+  containerAnimate: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoImageAnimate: {
+    resizeMode: 'cover',
+    borderRadius: 15,
+  },
+});
+
 
 export default PopularRecipeCard
