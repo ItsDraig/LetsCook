@@ -18,19 +18,19 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
         toValue: 2.5,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(translateXAnimation, {
         toValue: size * 0.7,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(translateYAnimation, {
         toValue: size * 0.45,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start(() => {
       //setSize(size + 50);
@@ -45,19 +45,19 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
         toValue: 1,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(translateXAnimation, {
         toValue: 0,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(translateYAnimation, {
         toValue: 0,
         duration: 500,
         easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start(() => {
       //setSize(size - 50);
