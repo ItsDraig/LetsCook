@@ -26,9 +26,10 @@ def get_recipe(link):
     raw_ingredients = soup.find_all('li', class_ = 'structured-ingredients__list-item')
     for ingredient in raw_ingredients:
         spans = ingredient.find_all('span')
-        ingredient_entry = []
+        ingredient_entry = ""
         for span in spans:
-            ingredient_entry.append(span.text)
+            if span.text not in ingredient_entry:
+                ingredient_entry += span.text + " "
         ingredient_list.append(ingredient_entry)
 
     instruction_list = []
@@ -57,8 +58,9 @@ def get_recipe(link):
                 image_urls_entry.append(image_url)
 
         instruction_entry = []
+        true_instruction_text = '"' + instruction_text + '"'
         instruction_entry.append(instruction_name)
-        instruction_entry.append(instruction_text)
+        instruction_entry.append(true_instruction_text)
         image_urls_list.append(image_urls_entry)
         instruction_list.append(instruction_entry)
 
