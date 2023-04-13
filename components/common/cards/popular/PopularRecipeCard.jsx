@@ -1,12 +1,16 @@
 import { React, useState, useRef } from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
+import RecipeModal from '../../../../app/recipe_modal'
+
 import styles from './popularrecipecard.style'
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
 
   const [size, setSize] = useState(85);
   const [isEnlarged, setIsEnlarged] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [recipeData, setRecipeData] = useState(item);
   const scaleAnimation = useRef(new Animated.Value(1)).current;
   const translateXAnimation = useRef(new Animated.Value(0)).current;
   const translateYAnimation = useRef(new Animated.Value(0)).current;
@@ -66,34 +70,46 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
     setIsEnlarged(false);
   };
 
-  return (
-    <TouchableOpacity 
-    style={styles.container(selectedRecipe, item)} ref={containerRef}
-    onPress={() => handleCardPress(item)}
-    >
-      <TouchableOpacity style={[styles.logoContainer(selectedRecipe, item), {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
-        <Animated.Image
-          source={{ uri: item.thumbnail }}
-          style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
-            transform: [
-              { translateX: translateXAnimation },
-              { translateY: translateYAnimation },
-              { scale: scaleAnimation },
-            ],}]}
-        />
-      </TouchableOpacity>
-      <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.jobName(selectedRecipe, item)} numberOfLines={1}>
-          {item.name}
-        </Text>
-      </View>
-    </TouchableOpacity>
+  return (
+    <View>
+      <TouchableOpacity 
+      style={styles.container(selectedRecipe, item)} ref={containerRef}
+      onPress={() => handleCardPress(item)}
+      >
+        <TouchableOpacity style={[styles.logoContainer(selectedRecipe, item), {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
+          <Animated.Image
+            source={{ uri: item.thumbnail }}
+            style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
+              transform: [
+                { translateX: translateXAnimation },
+                { translateY: translateYAnimation },
+                { scale: scaleAnimation },
+              ],}]}
+          />
+        </TouchableOpacity>
+        <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
+
+        <View style={styles.infoContainer}>
+          <Text style={styles.jobName(selectedRecipe, item)} numberOfLines={1}>
+            {item.name}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <RecipeModal
+        recipe={recipeData}
+        visible={modalVisible}
+        toggleModal={() => setModalVisible(!modalVisible)}/>
+    </View>
   )
 
   function handleCardPress(item) {
     console.log(item.name);
+    setRecipeData(item);
+    toggleModal();
   }
 }
 

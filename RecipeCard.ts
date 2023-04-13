@@ -14,7 +14,11 @@ export class RecipeCard
         servings?: number, images?: string[], ingredients?: string[], instructions?: string[])
     {
         this.name = name ?? 'Recipe Name';
-        this.thumbnail = thumbnail ?? '';
+        this.thumbnail = thumbnail ?? 'https://www.publicdomainpictures.net/pictures/280000/velka/not-found-image-15383864787lu.jpg';
+        if(this.thumbnail == '' || this.thumbnail == null)
+        {
+            this.thumbnail = 'https://www.publicdomainpictures.net/pictures/280000/velka/not-found-image-15383864787lu.jpg';
+        }
         this.preptime = preptime ?? 10;
         this.cooktime = cooktime ?? 35;
         this.totaltime = totaltime ?? 45;
