@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
+import { DraggableScrollView } from '../components/common/DraggableScrollView';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
+import IngredientTab from '../components/common/cards/IngredientTab';
 
 interface ModalProps {
     recipe: RecipeCard;
@@ -29,13 +31,13 @@ const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
               <Text style={styles.boldText}>Prep Time: <Text style={styles.stepText}>{recipe.preptime} mins</Text></Text>
               <Text style={styles.boldText}>Cook Time: <Text style={styles.stepText}>{recipe.cooktime} mins</Text></Text>
               <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.totaltime} mins</Text></Text>
-              <ScrollView>
-                <Text style={styles.subtitleText}>Ingredients:</Text>
+              <Text style={styles.subtitleText}>Ingredients:</Text>
+              <DraggableScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
                 {recipe.ingredients.map((ingredient, index) => (
-                  <Text style={styles.stepText} key={index}>{ingredient}</Text>
+                  <IngredientTab item={ingredient}/>
                 ))}
-              </ScrollView>
-              <ScrollView>
+              </DraggableScrollView>
+              <ScrollView centerContent showsVerticalScrollIndicator={false}>
                 <Text style={styles.subtitleText}>Steps:</Text>
                 {recipe.instructions.map((step, index) => (
                   <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>
@@ -75,6 +77,11 @@ const styles = StyleSheet.create({
         height: "100%",
         borderRadius: 15,
         resizeMode: "cover",
+    },
+    tabContainer: {
+      marginTop: SIZES.xSmall - 2,
+      width: "100%",
+      display: "flex",
     },
     tab: {
         marginTop: SIZES.medium,

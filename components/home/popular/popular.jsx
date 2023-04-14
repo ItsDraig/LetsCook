@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react
 import { useRouter } from 'expo-router'
 import { GetRecipes } from '../../../firebase'
 import { RecipeCard } from '../../../RecipeCard'
+import { DraggableFlatList } from '../../common/DraggableFlatList'
 
 import styles from './popular.style'
 import { COLORS, SIZES } from '../../../constants';
@@ -37,10 +38,10 @@ const Popular = () => {
         ) : error ? (
           <Text>Something went wrong</Text>
         ) : (
-          <FlatList
+          <DraggableFlatList
             data={recipeList}
             renderItem={({item}) => <PopularRecipeCard item={item}/>}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={item => item?.name}
             contentContainerStyle={{ columnGap: SIZES.medium }}
             horizontal
           />)}
