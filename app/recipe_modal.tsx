@@ -38,7 +38,7 @@ const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
               <ScrollView>
                 <Text style={styles.subtitleText}>Steps:</Text>
                 {recipe.instructions.map((step, index) => (
-                  <Text style={styles.stepText} key={index}>{step}</Text>
+                  <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>
                 ))}
               </ScrollView>
               <TouchableOpacity onPress={toggleModal} style={styles.tab}>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     recipeName: {
-        fontSize: SIZES.xLarge,
+        fontSize: SIZES.xLarge + 2,
         fontFamily: FONT.medium,
         color: COLORS.white,
         paddingTop: SIZES.medium,
@@ -103,16 +103,22 @@ const styles = StyleSheet.create({
         paddingTop: SIZES.xSmall - 1,
     },
     boldText: {
+      fontSize: SIZES.medium - 2,
+      fontFamily: FONT.bold,
+      color: COLORS.white,
+      paddingBottom: SIZES.xSmall,
+  },
+    boldStepText: {
         fontSize: SIZES.medium - 2,
         fontFamily: FONT.bold,
         color: COLORS.white,
-        paddingBottom: SIZES.xSmall,
+        paddingTop: SIZES.xSmall,
     },
     stepText: {
         fontSize: SIZES.small + 1,
         fontFamily: FONT.regular,
         color: "#B3AEC6",
-        marginTop: SIZES.small / 2,
+        marginBottom: SIZES.small / 2,
     },
 });
 
