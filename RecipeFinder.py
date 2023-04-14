@@ -65,7 +65,8 @@ def get_recipe(link):
 
         instruction_entry = ""
         true_instruction_text = instruction_text.replace(",", ";")
-        instruction_entry += instruction_name + ","
+        true_instruction_name = instruction_name.replace(",", ";")
+        instruction_entry += true_instruction_name + ","
         instruction_entry += true_instruction_text
         instruction_list += instruction_entry + ","
 
