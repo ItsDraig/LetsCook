@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
 import { DraggableScrollView } from '../components/common/DraggableScrollView';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
@@ -9,6 +9,22 @@ interface ModalProps {
     recipe: RecipeCard;
     visible: boolean;
     toggleModal: () => void;
+}
+
+const platformChecker = (recipe: any) => {
+  if (Platform.OS === 'web') {
+    return <DraggableScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
+    {recipe.ingredients.map((ingredient: any, index: any) => (
+      <IngredientTab item={ingredient}/>
+    ))}
+  </DraggableScrollView>
+  } else {
+    return <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
+    {recipe.ingredients.map((ingredient: any, index: any) => (
+      <IngredientTab item={ingredient}/>
+    ))}
+  </ScrollView>
+  }
 }
 
 const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
@@ -32,11 +48,7 @@ const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
               <Text style={styles.boldText}>Cook Time: <Text style={styles.stepText}>{recipe.cooktime} mins</Text></Text>
               <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.totaltime} mins</Text></Text>
               <Text style={styles.subtitleText}>Ingredients:</Text>
-              <DraggableScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <IngredientTab item={ingredient}/>
-                ))}
-              </DraggableScrollView>
+              {platformChecker(recipe)}
               <ScrollView centerContent showsVerticalScrollIndicator={false}>
                 <Text style={styles.subtitleText}>Steps:</Text>
                 {recipe.instructions.map((step, index) => (
