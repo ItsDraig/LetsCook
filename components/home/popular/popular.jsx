@@ -23,6 +23,20 @@ const Popular = () => {
     setRecipeList(recipes);
   }
 
+  const platformChecker = () => {
+    if (Platform.OS === 'web') {
+      return <DraggableFlatList data={recipeList}
+      renderItem={({item}) => <PopularRecipeCard item={item}/>}
+      keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
+      horizontal/>
+    } else {
+      return <FlatList data={recipeList}
+      renderItem={({item}) => <PopularRecipeCard item={item}/>}
+      keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
+      horizontal/>
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -35,16 +49,13 @@ const Popular = () => {
       <View style={styles.cardsContainer}>
         {isLoading ? (
           <ActivityIndicator size="large" colors={COLORS.primary} />
-        ) : error ? (
+        ) : error ?
+        (
           <Text>Something went wrong</Text>
-        ) : (
-          <DraggableFlatList
-            data={recipeList}
-            renderItem={({item}) => <PopularRecipeCard item={item}/>}
-            keyExtractor={item => item?.name}
-            contentContainerStyle={{ columnGap: SIZES.medium }}
-            horizontal
-          />)}
+        ) :
+        (
+          platformChecker()
+        )}
       </View>
     </View>
   )

@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import { FlatList } from 'react-native'
-import { useDraggableScrollFlatList } from './use-draggable-scroll-flatlist'
+import { useDraggableScrollFlatList } from './use-draggable-scroll-flatlist.web'
 
 export const DraggableFlatList = React.forwardRef<
   FlatList,
