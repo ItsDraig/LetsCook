@@ -40,7 +40,7 @@ const Popular = () => {
           <FlatList
             data={recipeList}
             renderItem={({item}) => <PopularRecipeCard item={item}/>}
-            keyExtractor={item => item?.name}
+            keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={{ columnGap: SIZES.medium }}
             horizontal
           />)}

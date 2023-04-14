@@ -1,15 +1,37 @@
-import { React, useState, useRef } from 'react'
+import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
+
+import RecipeModal from '../../../../app/recipe_modal'
 
 import styles from './favoriterecipecard.style'
 
 const FavoriteRecipeCard = ({ item, handleCardPress }) => {
   const [size, setSize] = useState(85);
   const [isEnlarged, setIsEnlarged] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [recipeData, setRecipeData] = useState(item);
+
+  // Background color gradient
+  const ingredientPercentage = useRef(new Animated.Value(0)).current;
+  const containerRef = useRef(null);
+  const gradientColors = ['#FFFFFF', "#312651"];
+  const recipeIngredientsCount = 10;// item.ingredients.filter((ingredient) => pantryIngredients.includes(ingredient)).length;
+  
+  useEffect(() => {
+    ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100);
+    const interpolatedColor = ingredientPercentage.interpolate({
+      inputRange: [0, 100],
+      outputRange: gradientColors,
+      extrapolate: 'clamp'
+    });
+    const color = interpolatedColor.__getValue();
+    containerRef.current.setNativeProps({style: [styles.container, {backgroundColor: color}]});
+  }, [recipeIngredientsCount]);
+
+  // Image animation
   const scaleAnimation = useRef(new Animated.Value(1)).current;
   const translateXAnimation = useRef(new Animated.Value(0)).current;
   const translateYAnimation = useRef(new Animated.Value(0)).current;
-  const containerRef = useRef(null);
 
   const animateSize = () => {
     Animated.parallel([
@@ -65,34 +87,46 @@ const FavoriteRecipeCard = ({ item, handleCardPress }) => {
     setIsEnlarged(false);
   };
 
-  return (
-    <TouchableOpacity 
-    style={styles.container(selectedRecipe, item)} ref={containerRef}
-    onPress={() => handleCardPress(item)}
-    >
-      <TouchableOpacity style={[styles.logoContainer(selectedRecipe, item), {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
-        <Animated.Image
-          source={{ uri: item.thumbnail }}
-          style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
-            transform: [
-              { translateX: translateXAnimation },
-              { translateY: translateYAnimation },
-              { scale: scaleAnimation },
-            ],}]}
-        />
-      </TouchableOpacity>
-      <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.jobName(selectedRecipe, item)} numberOfLines={1}>
-          {item.name}
-        </Text>
-      </View>
-    </TouchableOpacity>
+  return (
+    <View>
+      <TouchableOpacity 
+      ref={containerRef}
+      onPress={() => handleCardPress(item)}
+      >
+        <TouchableOpacity style={[styles.logoContainer, {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
+          <Animated.Image
+            source={{ uri: item.thumbnail }}
+            style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
+              transform: [
+                { translateX: translateXAnimation },
+                { translateY: translateYAnimation },
+                { scale: scaleAnimation },
+              ],}]}
+          />
+        </TouchableOpacity>
+        <Text style={styles.companyName} numberOfLines={1}>{`~ ${item.totaltime} mins`}</Text>
+
+        <View style={styles.infoContainer}>
+          <Text style={styles.jobName} numberOfLines={1}>
+            {item.name}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <RecipeModal
+        recipe={recipeData}
+        visible={modalVisible}
+        toggleModal={() => setModalVisible(!modalVisible)}/>
+    </View>
   )
 
   function handleCardPress(item) {
     console.log(item.name);
+    setRecipeData(item);
+    toggleModal();
   }
 }
 

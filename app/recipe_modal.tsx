@@ -10,11 +10,6 @@ interface ModalProps {
 }
 
 const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
-
-    const renderIngredient = ({ item }: { item: string }) => {
-        return <Text>{item}</Text>;
-    };
-    
     return (
       <Modal
         animationType="slide"
@@ -37,13 +32,13 @@ const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
               <ScrollView>
                 <Text style={styles.subtitleText}>Ingredients:</Text>
                 {recipe.ingredients.map((ingredient, index) => (
-                  <Text style={styles.stepText}>{ingredient}</Text>
+                  <Text style={styles.stepText} key={index}>{ingredient}</Text>
                 ))}
               </ScrollView>
               <ScrollView>
                 <Text style={styles.subtitleText}>Steps:</Text>
                 {recipe.instructions.map((step, index) => (
-                  <Text style={styles.stepText}>{step}</Text>
+                  <Text style={styles.stepText} key={index}>{step}</Text>
                 ))}
               </ScrollView>
               <TouchableOpacity onPress={toggleModal} style={styles.tab}>

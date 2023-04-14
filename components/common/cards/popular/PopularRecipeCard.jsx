@@ -1,4 +1,4 @@
-import { React, useState, useRef } from 'react'
+import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
 import RecipeModal from '../../../../app/recipe_modal'
@@ -6,15 +6,32 @@ import RecipeModal from '../../../../app/recipe_modal'
 import styles from './popularrecipecard.style'
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
-
   const [size, setSize] = useState(85);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [recipeData, setRecipeData] = useState(item);
+
+  // Background color gradient
+  const ingredientPercentage = useRef(new Animated.Value(0)).current;
+  const containerRef = useRef(null);
+  const gradientColors = ['#FFFFFF', "#312651"];
+  const recipeIngredientsCount = 10;// item.ingredients.filter((ingredient) => pantryIngredients.includes(ingredient)).length;
+  
+  useEffect(() => {
+    ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100);
+    const interpolatedColor = ingredientPercentage.interpolate({
+      inputRange: [0, 100],
+      outputRange: gradientColors,
+      extrapolate: 'clamp'
+    });
+    const color = interpolatedColor.__getValue();
+    containerRef.current.setNativeProps({style: [styles.container, {backgroundColor: color}]});
+  }, [recipeIngredientsCount]);
+
+  // Image animation
   const scaleAnimation = useRef(new Animated.Value(1)).current;
   const translateXAnimation = useRef(new Animated.Value(0)).current;
   const translateYAnimation = useRef(new Animated.Value(0)).current;
-  const containerRef = useRef(null);
 
   const animateSize = () => {
     Animated.parallel([
@@ -77,10 +94,10 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
   return (
     <View>
       <TouchableOpacity 
-      style={styles.container(selectedRecipe, item)} ref={containerRef}
+      ref={containerRef}
       onPress={() => handleCardPress(item)}
       >
-        <TouchableOpacity style={[styles.logoContainer(selectedRecipe, item), {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
+        <TouchableOpacity style={[styles.logoContainer, {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
           <Animated.Image
             source={{ uri: item.thumbnail }}
             style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
