@@ -66,8 +66,8 @@ const RecipeModal = ({recipe, visible, toggleModal }: ModalProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 650,
-        height: 650,
+        width: Platform.OS === 'web' ? 650 : '95%',
+        height: Platform.OS === 'web' ? 650 : '75%',
         padding: SIZES.xLarge,
         backgroundColor: COLORS.primary,
         borderRadius: SIZES.medium,

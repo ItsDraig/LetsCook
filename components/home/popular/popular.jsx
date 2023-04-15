@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
 import { GetRecipes } from '../../../firebase'
 import { RecipeCard } from '../../../RecipeCard'
@@ -23,6 +23,7 @@ const Popular = () => {
     setRecipeList(recipes);
   }
 
+  
   const platformChecker = () => {
     if (Platform.OS === 'web') {
       return <DraggableFlatList data={recipeList}
