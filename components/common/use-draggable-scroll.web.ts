@@ -1,11 +1,25 @@
 import { useEffect, useRef, useMemo, ForwardedRef } from 'react'
 import { Platform, findNodeHandle } from 'react-native'
 import type { ScrollView } from 'react-native'
-import { mergeRefs } from 'react-merge-refs'
 
 type Props<Scrollable extends ScrollView = ScrollView> = {
   cursor?: string
   outerRef?: ForwardedRef<Scrollable>
+}
+
+// Code taken from react-merge-refs package
+function mergeRefs<T = any>(
+  refs: Array<React.MutableRefObject<T> | React.LegacyRef<T>>
+): React.RefCallback<T> {
+  return (value) => {
+    refs.forEach((ref) => {
+      if (typeof ref === "function") {
+        ref(value);
+      } else if (ref != null) {
+        (ref as React.MutableRefObject<T | null>).current = value;
+      }
+    });
+  };
 }
 
 export function useDraggableScroll<Scrollable extends ScrollView = ScrollView>({
