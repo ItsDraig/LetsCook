@@ -3,7 +3,7 @@ import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
 import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
-import Badge from '@mui/material/Badge';
+import React, { useState } from 'react';
 import Colors from '../../constants/Colors';
 
 /**
@@ -18,9 +18,10 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const letsCookRecipes = 3;
 
   return (
-    <Tabs
+      <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       }}>
@@ -37,8 +38,7 @@ export default function TabLayout() {
                     name="info-circle"
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
+                    style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }} />
                 )}
               </Pressable>
             </Link>
@@ -47,65 +47,58 @@ export default function TabLayout() {
           headerRight: () => (
             <ScreenHeaderBtn iconUrl={images.profile} dimension="100%" handlePress={undefined} />
           ),
-        }}
-      />
+        }} />
       <Tabs.Screen
-        name="search"
+        name="groceries"
         options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
-        }}
-      />
+          title: 'Grocery List',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+        }} />
       <Tabs.Screen
         name="lets-cook"
         options={{
           title: 'Lets Cook!',
-          tabBarBadge: 5,
+          tabBarBadge: letsCookRecipes,
           tabBarIcon: ({ color }) => <TabBarIcon name="plus-square" color={color} />,
-        }}
-      />
+        }} />
       <Tabs.Screen
         name="recipes"
         options={{
           title: 'Recipes',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
           headerRight: () => (
-            <Link href="/add_recipe" asChild> 
+            <Link href="/add_recipe" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
                     name="plus-circle"
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />
                 )}
               </Pressable>
             </Link>
           ),
-        }}
-      />
+        }} />
       <Tabs.Screen
         name="pantry"
         options={{
           title: 'Pantry',
           tabBarIcon: ({ color }) => <TabBarIcon name="archive" color={color} />,
           headerRight: () => (
-            <Link href="/add_ingredient" asChild> 
+            <Link href="/add_ingredient" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
                     name="plus-circle"
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />
                 )}
               </Pressable>
             </Link>
           ),
-        }}
-      />
+        }} />
     </Tabs>
   );
 }

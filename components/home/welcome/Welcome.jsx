@@ -6,7 +6,7 @@ import { icons, SIZES } from '../../../constants'
 import styles from './Welcome.style'
 
 
-const recipeTypes = ["All Ingredients", "Most Ingredients", "All Recipes"];
+const recipeTypes = ["All Ingredients", "Most Ingredients", "Chinese", "Vegan", "Italian", "Mexican"];
 
 const Welcome = () => {
   const router = useRouter();
@@ -46,7 +46,7 @@ const Welcome = () => {
             <TouchableOpacity style = {styles.tab(activeRecipeType, item)}
             onPress={() => {
               setActiveRecipeType(item);
-              router.push(`/search/${item}`)
+              //router.push(`/search/${item}`)
             }}>
               <Text style={styles.tabText(activeRecipeType, item)}>{item}</Text>
             </TouchableOpacity>

@@ -156,7 +156,7 @@ function onPressAddRecipe(newRecipe: any)
 {
   console.log("Adding recipe to firebase database");
   let recipe = new RecipeCard(newRecipe.recipeName, '', parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
-  parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), parseInt(newRecipe.servings), [''], newRecipe.ingredients, newRecipe.instructions);
+  parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), newRecipe.servings, [''], newRecipe.ingredients, newRecipe.instructions);
   AddRecipe(recipe);
 }
 

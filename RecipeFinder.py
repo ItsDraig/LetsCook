@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import random
 import csv # might replace csv functionality with writing directly to database
 
 recipes_data = []
@@ -75,6 +76,8 @@ def get_recipe(link):
     instruction_list = instruction_list[1:-1]
     image_urls_list = image_urls_list[:-1]
 
+    rating = 0
+
     recipe_dict = { 'name' : recipe_name,
                 'thumbnail' : thumbnail_url,
                 'cooktime' : cook_time, 
@@ -83,15 +86,15 @@ def get_recipe(link):
                 'servings' : servings,
                 'ingredients' : ingredient_list,  
                 'instructions' : instruction_list,
-                'images' : image_urls_list
-                #'rating' : rating,
+                'images' : image_urls_list,
+                'rating' : rating
                 }
 
     recipes_data.append(recipe_dict)   
 
 def write_to_csv(dictionary): # should be a list of dictionaries
     csv_file = "recipes.csv"
-    field_names = ['name', 'thumbnail', 'cooktime', 'preptime', 'totaltime', 'servings', 'ingredients', 'instructions', 'images']
+    field_names = ['name', 'thumbnail', 'cooktime', 'preptime', 'totaltime', 'servings', 'ingredients', 'instructions', 'images', 'rating']
     try:
         with open(csv_file, 'w', newline='', encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=field_names)

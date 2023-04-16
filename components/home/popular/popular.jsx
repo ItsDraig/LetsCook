@@ -55,7 +55,8 @@ const Popular = () => {
           <Text>Something went wrong</Text>
         ) :
         (
-          platformChecker()
+          
+            platformChecker()
         )}
       </View>
     </View>

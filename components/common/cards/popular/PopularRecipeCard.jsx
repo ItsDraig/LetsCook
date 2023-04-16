@@ -2,23 +2,64 @@ import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
 import RecipeModal from '../../../../app/recipe_modal'
-
+import TabLayout from '../../../../app/(tabs)/_layout'
 import styles from './popularrecipecard.style'
+import * as SQLite from 'expo-sqlite';
+
+const idb = SQLite.openDatabase('ingredients.db');
+
+function getFirstColumnAsArray(db, table, column) {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(`SELECT ${column} FROM ${table}`, [], (tx, results) => {
+        const rows = results.rows;
+        const resultArray = [];
+
+        for (let i = 0; i < rows.length; i++) {
+          const { name } = rows.item(i); // extract the name property from the object
+          resultArray.push(name);
+        }
+
+        resolve(resultArray);
+      }, (error) => {
+        reject(error);
+      });
+    });
+  });
+}
+
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
   const [size, setSize] = useState(85);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [recipeData, setRecipeData] = useState(item);
+  const [pantryIngredients, setPantryIngredients] = useState([]);
 
   // Background color gradient
   const ingredientPercentage = useRef(new Animated.Value(0)).current;
   const containerRef = useRef(null);
   const gradientColors = ['#FFFFFF', "#312651"];
-  const recipeIngredientsCount = 10;// item.ingredients.filter((ingredient) => pantryIngredients.includes(ingredient)).length;
-  
+  const recipeIngredientsCount = item.ingredients.filter((ingredient) => pantryIngredients.includes(ingredient)).length;
+
   useEffect(() => {
-    ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100);
+    const tableName = 'ingredients';
+    const columnName = 'name';
+
+    getFirstColumnAsArray(idb, tableName, columnName)
+      .then((result) => setPantryIngredients(result))
+      .catch((error) => console.error(error));
+  }, []);
+
+  useEffect(() => {
+    ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100 + 20); // remove the + 20 but change recipe card somehow
+    if (ingredientPercentage.__getValue() >= 100) {
+        // increase value of a counter in _layout.tsx
+    }
+  }, []);
+
+  useEffect(() => {
+    ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100 + 20); // remove the + 20 but change recipe card somehow
     const interpolatedColor = ingredientPercentage.interpolate({
       inputRange: [0, 100],
       outputRange: gradientColors,

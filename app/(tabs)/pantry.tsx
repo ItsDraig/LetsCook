@@ -4,6 +4,7 @@ import { Text, View } from '../../components/Themed';
 import * as SQLite from 'expo-sqlite';
 import { SQLError } from 'expo-sqlite';
 import { useFocusEffect } from '@react-navigation/native';
+import IngredientTab from '../../components/common/cards/IngredientTab';
 
 const db = SQLite.openDatabase('ingredients.db');
 
