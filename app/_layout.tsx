@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, StyleSheet, View } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -42,13 +42,23 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <>
+    <View style={styles.window}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  window: {
+    height: '100%',
+    position: 'absolute',
+    left: 0,
+    width: '100%',
+    overflow: 'hidden',
+  },
+});

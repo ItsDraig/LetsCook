@@ -1,5 +1,5 @@
-import React, {useState, useEffect } from 'react';
-import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform } from 'react-native';
+import React, {useState, useEffect, useRef } from 'react';
+import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform, Animated } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
 import { DraggableScrollView } from '../components/common/DraggableScrollView';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
@@ -90,6 +90,31 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
     const filledStars = Math.floor(0); 
     const hasHalfStar = 0 - filledStars >= 0.5;
 
+    // Scrollbar
+    const [completeScrollBarHeight, setCompleteScrollBarHeight] = useState(1);
+    const [visibleScrollBarHeight, setVisibleScrollBarHeight] = useState(0);
+    const scrollIndicator = useRef(new Animated.Value(0)).current;
+
+    const scrollIndicatorSize =
+      completeScrollBarHeight > visibleScrollBarHeight
+        ? (visibleScrollBarHeight * visibleScrollBarHeight) /
+          completeScrollBarHeight
+        : visibleScrollBarHeight;
+
+    const difference =
+      visibleScrollBarHeight > scrollIndicatorSize
+        ? visibleScrollBarHeight - scrollIndicatorSize
+        : 0;
+
+    const scrollIndicatorPosition = Animated.multiply(
+      scrollIndicator,
+      visibleScrollBarHeight / completeScrollBarHeight
+    ).interpolate({
+      inputRange: [0, difference],
+      outputRange: [0, difference],
+      extrapolate: 'clamp'
+    });
+
     const tableName = 'ingredients';
     const columnName = 'name';
     const [canCookBG, setCanCookBG] = useState(COLORS.secondary);
@@ -128,24 +153,22 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
         onRequestClose={toggleModal}>
           <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
             <View style={styles.container}>
-            <Header 
-              containerStyle={styles.headerContainer}
-              centerComponent={
-              <View style={styles.logoContainer}>
-                  <Image
-                    source={{ uri: recipe.thumbnail }}
-                    style={styles.logoImage}
-                  />
-              </View>
-              }
-              rightComponent={
-                <FavoriteButton
-                  isFavorite={isFavorite}
-                  onPress={toggleFavorite}
-                  style={styles.favoriteButton}
-                />
-              }
-              ></Header>
+              <Header 
+                containerStyle={styles.headerContainer}
+                centerComponent={
+                <View style={styles.logoContainer}>
+                    <Image
+                      source={{ uri: recipe.thumbnail }}
+                      style={styles.logoImage}
+                    />
+                </View>
+                }
+                rightComponent={
+                  <FavoriteButton
+                    isFavorite={isFavorite}
+                    onPress={toggleFavorite}
+                    style={styles.favoriteButton}/>}>
+                </Header>
               <Text style={styles.recipeName}>{recipe.name}</Text>
               <View style={styles.ratingContainer}>
                 {[...Array(5)].map((_, index) => renderStar(index))}
@@ -157,19 +180,32 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
               <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.totaltime} mins</Text></Text>
               <Text style={styles.subtitleText}>Ingredients:</Text>
               {platformChecker(recipe)}
-              <ScrollView style={styles.instructions} centerContent showsVerticalScrollIndicator={false}>
-                <Text style={styles.subtitleText}>Steps:</Text>
-                {recipe.instructions.map((step, index) => (
-                  <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>
-                ))}
-              </ScrollView>
+              <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
+                <ScrollView
+                  style={styles.instructions}
+                  centerContent
+                  contentContainerStyle={{ paddingRight: 14 }}
+                  showsVerticalScrollIndicator={false}
+                  onContentSizeChange={(width, height) => {setCompleteScrollBarHeight(height);}}
+                  onLayout={({nativeEvent: {layout: { height }}}) => {setVisibleScrollBarHeight(height);}}
+                  onScroll={Animated.event([{nativeEvent:{contentOffset: {y: scrollIndicator}}}],{useNativeDriver: false})}
+                  scrollEventThrottle={15}
+                >
+                  <Text style={styles.subtitleText}>Steps:</Text>
+                    {recipe.instructions.map((step, index) => (
+                      <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
+                </ScrollView>
+                <View style={{ height: '100%', width: 6, backgroundColor: '#52057b', borderRadius: 8}}>
+                  <Animated.View style={{ width: 6, borderRadius: 8, backgroundColor: '#bc6ff1', height: scrollIndicatorSize, transform: [{ translateY: scrollIndicatorPosition }]}}/>
+                </View>
+              </View>
               <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={toggleModal} style={styles.tab}>
-                    <Text style={styles.tabText}>Close</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toggleModal} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
-                    <Text style={[styles.letsCookTabText, { color: canCookText }]}>Lets Cook!</Text>
-                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleModal} style={styles.tab}>
+                      <Text style={styles.tabText}>Close</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={toggleModal} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
+                      <Text style={[styles.letsCookTabText, { color: canCookText }]}>Lets Cook!</Text>
+                  </TouchableOpacity>
               </View>
                 
             </View>
@@ -196,7 +232,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     instructions: {
-        height: 550
+      height: '100%',
     },
     headerContainer: {
       width: Platform.OS === 'web' ? 650 : '95%',
@@ -243,8 +279,10 @@ const styles = StyleSheet.create({
     },
     tabContainer: {
       marginTop: SIZES.xSmall - 2,
+      marginBottom: SIZES.xSmall,
       width: "100%",
       display: "flex",
+      flexGrow: 0,
     },
     tab: {
         marginTop: SIZES.medium,

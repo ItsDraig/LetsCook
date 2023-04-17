@@ -40,27 +40,26 @@ const IngredientTab = (ingredient) => {
       }, []);
 
     return (
-        <View style={styles.tabsContainer}>
             <TouchableOpacity
               style = {[styles.tab(ingredient), { borderColor: pantryIngredients.includes(ingredient.item) ?  COLORS.gray2 : COLORS.secondary}]}
               onPress={() => {console.log(ingredient.item, pantryIngredients)}}>
               <Text style={styles.tabText}>{ingredient.item}</Text>
             </TouchableOpacity>
-        </View>
     )
 }
 
 const styles = StyleSheet.create({
     tabsContainer: {
-        height: 100,
-        marginBottom: Platform.OS === 'web' ? 25 : 40,
+        //height: 100,
+        //marginBottom: Platform.OS === 'web' ? 25 : 40,
     },
     tab: (ingredient) => ({
         marginEnd: SIZES.small,
         paddingVertical: SIZES.small / 2,
         paddingHorizontal: SIZES.small,
         borderRadius: SIZES.medium,
-        borderWidth: 1  
+        borderWidth: 1,
+        height: 30,
     }),
     tabText:{
         fontSize: SIZES.small + 1,

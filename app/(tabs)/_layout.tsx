@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Pressable, useColorScheme } from 'react-native';
+import { Pressable, View, useColorScheme } from 'react-native';
 import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
 import React, { useState } from 'react';
@@ -21,6 +21,7 @@ export default function TabLayout() {
   const letsCookRecipes = 3;
 
   return (
+    <View style={{flex: 1, height: '100%'}}>
       <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -100,5 +101,6 @@ export default function TabLayout() {
           ),
         }} />
     </Tabs>
+    </View>
   );
 }
