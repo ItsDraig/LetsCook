@@ -82,7 +82,7 @@ const platformInstructions = (recipe: any) => {
   if (Platform.OS === 'web') {
     return <CustomScrollBarScrollViewVertical recipe={recipe}></CustomScrollBarScrollViewVertical>
   } else {
-    return <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
+    return <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
         <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
           <Text style={styles.subtitleText}>Steps:</Text>
             {recipe.instructions.map((step:any, index:any) => (

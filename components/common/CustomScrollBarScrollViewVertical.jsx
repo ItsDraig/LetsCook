@@ -29,7 +29,7 @@ const CustomScrollBarScrollViewVertical = props => {
     });
 
     return (
-      <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
+      <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
           <ScrollView
             style={styles.instructions}
             centerContent
