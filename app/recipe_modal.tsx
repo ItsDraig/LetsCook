@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef } from 'react';
 import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform, Animated } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
 import { DraggableScrollView } from '../components/common/DraggableScrollView';
+import CustomScrollBarScrollViewVertical from "../components/common/CustomScrollBarScrollViewVertical"
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
 import IngredientTab from '../components/common/cards/IngredientTab';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -9,6 +10,7 @@ import { Header } from 'react-native-elements';
 import FavoriteButton from '../components/common/cards/FavoriteButton';
 import * as SQLite from 'expo-sqlite';
 import { Database, SQLError, SQLTransaction } from 'expo-sqlite';
+import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
 
 const idb = SQLite.openDatabase('ingredients.db');
 const srdb = SQLite.openDatabase('saved_recipes.db');
@@ -64,19 +66,25 @@ function checkArrayInDB(db: Database, tableName: string, columnName: string, arr
   });
 }
 
-const platformChecker = (recipe: any) => {
+const platformIngredients = (recipe: any) => {
   if (Platform.OS === 'web') {
-    return <DraggableScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
-    {recipe.ingredients.map((ingredient: any, index: any) => (
-      <IngredientTab item={ingredient}/>
-    ))}
-  </DraggableScrollView>
+    return <CustomScrollBarDraggableScrollViewHorizontal recipe={recipe}></CustomScrollBarDraggableScrollViewHorizontal>
   } else {
     return <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
     {recipe.ingredients.map((ingredient: any, index: any) => (
       <IngredientTab item={ingredient}/>
     ))}
   </ScrollView>
+  }
+}
+
+const platformInstructions = (recipe: any) => {
+  if (Platform.OS === 'web') {
+    return <CustomScrollBarScrollViewVertical recipe={recipe}></CustomScrollBarScrollViewVertical>
+  } else {
+    return <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
+      <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }} scrollEventThrottle={16}/>
+    </View>
   }
 }
 
@@ -89,31 +97,6 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
     const numRatings = 0;
     const filledStars = Math.floor(0); 
     const hasHalfStar = 0 - filledStars >= 0.5;
-
-    // Scrollbar
-    const [completeScrollBarHeight, setCompleteScrollBarHeight] = useState(1);
-    const [visibleScrollBarHeight, setVisibleScrollBarHeight] = useState(0);
-    const scrollIndicator = useRef(new Animated.Value(0)).current;
-
-    const scrollIndicatorSize =
-      completeScrollBarHeight > visibleScrollBarHeight
-        ? (visibleScrollBarHeight * visibleScrollBarHeight) /
-          completeScrollBarHeight
-        : visibleScrollBarHeight;
-
-    const difference =
-      visibleScrollBarHeight > scrollIndicatorSize
-        ? visibleScrollBarHeight - scrollIndicatorSize
-        : 0;
-
-    const scrollIndicatorPosition = Animated.multiply(
-      scrollIndicator,
-      visibleScrollBarHeight / completeScrollBarHeight
-    ).interpolate({
-      inputRange: [0, difference],
-      outputRange: [0, difference],
-      extrapolate: 'clamp'
-    });
 
     const tableName = 'ingredients';
     const columnName = 'name';
@@ -141,9 +124,6 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
         return <EmptyStar key={index} />;
       }
     };
-
-      
-      //const canCookText = isInDatabase ? COLORS.tertiary : COLORS.gray;
 
     return (
       <Modal
@@ -179,26 +159,8 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
               <Text style={styles.boldText}>Cook Time: <Text style={styles.stepText}>{recipe.cooktime} mins</Text></Text>
               <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.totaltime} mins</Text></Text>
               <Text style={styles.subtitleText}>Ingredients:</Text>
-              {platformChecker(recipe)}
-              <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
-                <ScrollView
-                  style={styles.instructions}
-                  centerContent
-                  contentContainerStyle={{ paddingRight: 14 }}
-                  showsVerticalScrollIndicator={false}
-                  onContentSizeChange={(width, height) => {setCompleteScrollBarHeight(height);}}
-                  onLayout={({nativeEvent: {layout: { height }}}) => {setVisibleScrollBarHeight(height);}}
-                  onScroll={Animated.event([{nativeEvent:{contentOffset: {y: scrollIndicator}}}],{useNativeDriver: false})}
-                  scrollEventThrottle={15}
-                >
-                  <Text style={styles.subtitleText}>Steps:</Text>
-                    {recipe.instructions.map((step, index) => (
-                      <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
-                </ScrollView>
-                <View style={{ height: '100%', width: 6, backgroundColor: '#52057b', borderRadius: 8}}>
-                  <Animated.View style={{ width: 6, borderRadius: 8, backgroundColor: '#bc6ff1', height: scrollIndicatorSize, transform: [{ translateY: scrollIndicatorPosition }]}}/>
-                </View>
-              </View>
+              {platformIngredients(recipe)}
+              {platformInstructions(recipe)}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={toggleModal} style={styles.tab}>
                       <Text style={styles.tabText}>Close</Text>
