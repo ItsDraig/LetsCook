@@ -83,8 +83,12 @@ const platformInstructions = (recipe: any) => {
     return <CustomScrollBarScrollViewVertical recipe={recipe}></CustomScrollBarScrollViewVertical>
   } else {
     return <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 20}}>
-      <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }} scrollEventThrottle={16}/>
-    </View>
+        <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
+          <Text style={styles.subtitleText}>Steps:</Text>
+            {recipe.instructions.map((step:any, index:any) => (
+              <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
+        </ScrollView>
+      </View>
   }
 }
 
