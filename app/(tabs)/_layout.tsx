@@ -5,6 +5,7 @@ import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
 import React, { useState } from 'react';
 import Colors from '../../constants/Colors';
+import AddRecipeModal from '../add_recipe';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -19,6 +20,11 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const letsCookRecipes = 3;
+
+  const [addRecipeModalVisible, setAddRecipeModalVisible] = useState(false);
+  const toggleAddRecipeModal = () => {
+    setAddRecipeModalVisible(!addRecipeModalVisible);
+  };
 
   return (
     <View style={{flex: 1, height: '100%'}}>
@@ -68,17 +74,15 @@ export default function TabLayout() {
           title: 'Recipes',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
           headerRight: () => (
-            <Link href="/add_recipe" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="plus-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />
-                )}
-              </Pressable>
-            </Link>
+            <Pressable onPress={toggleAddRecipeModal}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name="plus-circle"
+                  size={25}
+                  color={Colors[colorScheme ?? 'light'].text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />
+              )}
+            </Pressable>
           ),
         }} />
       <Tabs.Screen
@@ -101,6 +105,10 @@ export default function TabLayout() {
           ),
         }} />
     </Tabs>
+
+      <AddRecipeModal
+        visible={addRecipeModalVisible}
+        toggleModal={() => setAddRecipeModalVisible(!addRecipeModalVisible)}/>
     </View>
   );
 }

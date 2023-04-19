@@ -40,11 +40,11 @@ const IngredientTab = (ingredient) => {
       }, []);
 
     return (
-            <TouchableOpacity
-              style = {[styles.tab(ingredient), { borderColor: pantryIngredients.includes(ingredient.item) ?  COLORS.gray2 : COLORS.secondary}]}
-              onPress={() => {console.log(ingredient.item, pantryIngredients)}}>
-              <Text style={styles.tabText}>{ingredient.item}</Text>
-            </TouchableOpacity>
+      <TouchableOpacity
+        style = {[styles.tab(ingredient), { borderColor: pantryIngredients.includes(ingredient.item) ?  COLORS.gray2 : COLORS.secondary}]}
+        onPress={() => {console.log(ingredient.item, pantryIngredients)}}>
+        <Text style={styles.tabText}>{ingredient.item}</Text>
+      </TouchableOpacity>
     )
 }
 

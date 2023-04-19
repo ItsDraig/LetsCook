@@ -1,16 +1,13 @@
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-
 import { Text, View } from '../../components/Themed';
-
-const TextInANest = () => {
-  
-}
 
 export default function TabFourScreen() {
   // need a way to hide these if the user has recipes
   const noRecipeText = 'You currently have no recipes. Add more recipes using '
   const search = 'Search'
   const noRecipeTextCont = ' or by adding your own recipes using the button above! '
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recipes</Text>
