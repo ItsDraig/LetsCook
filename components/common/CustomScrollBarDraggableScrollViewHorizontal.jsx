@@ -18,7 +18,7 @@ const CustomScrollBarDraggableScrollViewHorizontal = props => {
 
   const difference =
     visibleScrollBarWidth > scrollIndicatorSize
-      ? visibleScrollBarWidth - scrollIndicatorSize - SIZES.xSmall + 1
+      ? visibleScrollBarWidth - scrollIndicatorSize - SIZES.xSmall + 2
       : 0;
 
   const scrollIndicatorPosition = Animated.multiply(
@@ -42,7 +42,7 @@ const CustomScrollBarDraggableScrollViewHorizontal = props => {
             </Pressable>
         </DraggableScrollView>
         <View style={{ opacity: showScrollBar ? 1 : 0 }}>
-          <View style={{ height: 6, width: '99%', backgroundColor: '#52057b', borderRadius: 8, marginTop: SIZES.xSmall - 3,}}>
+          <View style={{ height: 6, width: '99%', backgroundColor: '#52057b', borderRadius: 8, marginTop: SIZES.xSmall - 3}}>
             <Animated.View style={{ height: 6, borderRadius: 8, backgroundColor: '#bc6ff1', width: scrollIndicatorSize, transform: [{ translateX: scrollIndicatorPosition }]}}/>
           </View>
         </View>

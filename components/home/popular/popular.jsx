@@ -37,7 +37,7 @@ const Popular = () => {
           : visibleScrollBarWidth;
       const difference =
         visibleScrollBarWidth > scrollIndicatorSize
-          ? visibleScrollBarWidth - scrollIndicatorSize - SIZES.large
+          ? visibleScrollBarWidth - scrollIndicatorSize - SIZES.large + 5
           : 0;
       const scrollIndicatorPosition = Animated.multiply(
         scrollIndicator,
