@@ -15,6 +15,7 @@ interface ModalProps {
 
 const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']});
+  const [recipeImage, setRecipeImage] = useState('https://static.thenounproject.com/png/3322766-200.png');
   const [isIngredientInputClicked, setIsIngredientInputClicked] = useState(false);
   const [isInstructionInputClicked, setIsInstructionInputClicked] = useState(false);
   const [numIngredients, setNumIngredients] = useState(0);
@@ -36,6 +37,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   {
     console.log("Clearing text fields");
     setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']})
+    setRecipeImage('https://static.thenounproject.com/png/3322766-200.png');
     setNumIngredients(1);
     setIngredients(['']);
     setNumInstructions(1);
@@ -47,12 +49,16 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   function onPressAddRecipe(newRecipe: any)
   {
     console.log("Adding recipe to firebase database");
-    let recipe = new RecipeCard(newRecipe.recipeName, '', parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
+    let recipe = new RecipeCard(newRecipe.recipeName, recipeImage, parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
     parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), newRecipe.servings, [''], newRecipe.ingredients, newRecipe.instructions);
     AddRecipe(recipe);
     toggleModal();
     ClearFields();
   }
+
+  const handleImageChange = (text: '') => {
+    setRecipeImage(text);
+  };
 
   const handleIngredientInputFocus = () => {
     setIsIngredientInputClicked(true);
@@ -134,6 +140,15 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
     return inputComponents;
   };
 
+  const onChangeImageText = (text: string) => {
+    setRecipeImage(text);
+  };
+
+  const onImagePress = () => {
+    setRecipeImage('');
+    checkFieldValues();
+  }
+
   return (
     <Modal
       animationType="slide"
@@ -143,9 +158,16 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
           <View style={styles.container}>
             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-            <View style={styles.logoContainer}>
-              <Image source={{ uri: 'https://static.thenounproject.com/png/3322766-200.png' }} style={styles.logoImage}/>
-            </View>
+            <TouchableOpacity style={[styles.logoContainer, {zIndex: 2, backgroundColor: COLORS.primary}]} onPress={onImagePress}>
+              {recipeImage ? (
+                <Image source={{ uri: recipeImage }} style={styles.logoImage} />
+                ) : (
+                  <TextInput style={styles.input} 
+                  onChangeText={(text) => onChangeImageText(text)}
+                  value={recipeImage}
+                  placeholder="Paste image URL"/>
+                )}
+            </TouchableOpacity>
             <View style={styles.inputContainer}>
               <Text style={styles.recipeName}>{recipe.recipeName}</Text>
                 <TextInput style={styles.input} 
