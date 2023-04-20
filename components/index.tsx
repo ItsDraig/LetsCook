@@ -5,6 +5,9 @@ import Welcome from "./home/welcome/Welcome";
 import Favorite from "./home/favorite/favorites";
 import Popular from "./home/popular/popular";
 
+// lets cook screen
+import LetsCook from "./letscook/letscook"
+
 // job details screen
 import Company from "./jobdetails/company/Company";
 import { default as JobTabs } from "./jobdetails/tabs/Tabs";
@@ -23,6 +26,7 @@ export {
   Company,
   JobTabs,
   JobAbout,
+  LetsCook,
   JobFooter,
   Specifics,
   NearbyJobCard

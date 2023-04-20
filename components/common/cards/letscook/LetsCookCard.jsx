@@ -1,9 +1,9 @@
 import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
-import RecipeModal from '../../../../app/recipe_modal'
+import LetsCookModal from '../../../../app/letscook_modal'
 import TabLayout from '../../../../app/(tabs)/_layout'
-import styles from './popularrecipecard.style'
+import styles from './letscookcard.style'
 import * as SQLite from 'expo-sqlite';
 import { FontAwesome } from '@expo/vector-icons'; 
 
@@ -30,8 +30,8 @@ function getFirstColumnAsArray(db, table, column) {
 }
 
 
-const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
-  const [size, setSize] = useState(85);
+const LetsCookCard = ({ item, selectedRecipe, handleCardPress}) => {
+  const [size, setSize] = useState(105);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [recipeData, setRecipeData] = useState(item);
@@ -139,27 +139,44 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
       ref={containerRef}
       onPress={() => handleCardPress(item)}
       >
-        <TouchableOpacity style={[styles.logoContainer, {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
-          <Animated.Image
-            source={{ uri: item.thumbnail }}
-            style={[stylesAnimate.logoImageAnimate, {width: 85, height: size,
-              transform: [
-                { translateX: translateXAnimation },
-                { translateY: translateYAnimation },
-                { scale: scaleAnimation },
-              ],}]}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity style={[styles.logoContainer, {zIndex: 2}]} onPress={isEnlarged ? resetSize : animateSize}>
+            <Animated.Image
+              source={{ uri: item.thumbnail }}
+              style={[stylesAnimate.logoImageAnimate, {width: 105, height: size,
+                transform: [
+                  { translateX: translateXAnimation },
+                  { translateY: translateYAnimation },
+                  { scale: scaleAnimation },
+                ],}]}
+            />
+          </TouchableOpacity>
+          <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end'  }}>
+            <View style={{ flexDirection: 'row'}}>
+              <Text style={styles.cardName}>Servings: </Text>
+              <Text style={styles.companyName}> {item.servings} </Text>
+            </View>
+            <View style={{ flexDirection: 'row'}}>
+              <Text style={styles.cardName}>Prep Time: </Text>
+              <Text style={styles.companyName}> {item.preptime} minutes</Text>
+            </View>
+            <View style={{ flexDirection: 'row'}}>
+              <Text style={styles.cardName}>Cook Time: </Text>
+              <Text style={styles.companyName}> {item.cooktime} minutes</Text>
+            </View>
+          </View>    
+        </View>
         
-        <Text style={styles.companyName} numberOfLines={1}><FontAwesome name="clock-o" size={19} color="#B3AEC6" style={{ position: 'relative', lineHeight: 25, top: 1 }} />{` ${item.totaltime} mins`}</Text>
+        <Text style={styles.companyName} numberOfLines={1}><FontAwesome name="clock-o" size={19} color="#B3AEC6" style={{ position: 'relative', lineHeight: 15, top: 1 }} />{` ${item.totaltime} mins`}</Text>
 
-        <View style={styles.infoContainer}>
+        <View style={[styles.infoContainer, { flexDirection: 'row'}]}>
           <Text style={styles.jobName(selectedRecipe, item)} numberOfLines={1}>
-            {item.name}
+            {item.name} 
           </Text>
+          <Text style={styles.companyName}></Text>
         </View>
       </TouchableOpacity>
-      <RecipeModal
+      <LetsCookModal
         recipe={recipeData}
         visible={modalVisible}
         toggleModal={() => setModalVisible(!modalVisible)}/>
@@ -186,4 +203,4 @@ const stylesAnimate = StyleSheet.create({
 });
 
 
-export default PopularRecipeCard
+export default LetsCookCard

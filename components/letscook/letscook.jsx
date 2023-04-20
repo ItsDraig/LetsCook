@@ -1,14 +1,14 @@
 import { React, useState, useRef } from 'react'
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Animated, Pressable } from 'react-native'
 import { useRouter } from 'expo-router'
-import { GetRecipes } from '../../../firebase'
-import { DraggableFlatList } from '../../common/DraggableFlatList'
+import { GetRecipes } from '../../firebase'
+import { DraggableFlatList } from '../common/DraggableFlatList'
 
-import styles from './popular.style'
-import { COLORS, SIZES } from '../../../constants';
-import PopularRecipeCard from '../../common/cards/popular/PopularRecipeCard';
+import styles from './letscook.style'
+import { COLORS, SIZES } from '../../constants';
+import LetsCookCard from '../common/cards/letscook/LetsCookCard';
 
-const Popular = () => {
+const LetsCook = () => {
   const router = useRouter();
   var isLoading = false;
   const error = false;
@@ -49,9 +49,8 @@ const Popular = () => {
       return <View style={{ flex: 1, flexDirection: 'column'}}>
         <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)}>
           <DraggableFlatList data={recipeList}
-            renderItem={({item}) => <PopularRecipeCard item={item}/>}
+            renderItem={({item}) => <LetsCookCard item={item}/>}
             keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
-            horizontal
             showsHorizontalScrollIndicator={false}
             onContentSizeChange={(width, height) => {setCompleteScrollBarWidth(width);}}
             onLayout={({nativeEvent: {layout: { width }}}) => {setVisibleScrollBarWidth(width);}}
@@ -66,7 +65,7 @@ const Popular = () => {
       </View>
     } else {
       return <FlatList data={recipeList}
-      renderItem={({item}) => <PopularRecipeCard item={item}/>}
+      renderItem={({item}) => <LetsCookCard item={item}/>}
       keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
       horizontal/>
     }
@@ -75,7 +74,7 @@ const Popular = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Popular Recipes</Text>
+        <Text style={styles.headerTitle}>Let's Cook!</Text>
         <TouchableOpacity>
           <Text style={styles.headerBtn}>Show all</Text>
         </TouchableOpacity>
@@ -96,4 +95,4 @@ const Popular = () => {
   )
 }
 
-export default Popular
+export default LetsCook

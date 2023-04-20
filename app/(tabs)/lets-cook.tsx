@@ -1,6 +1,6 @@
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { Popular } from '../../components'
+import { LetsCook } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
 
 export default function TabThreeScreen() {
@@ -9,9 +9,7 @@ export default function TabThreeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.welcome}>
-          <Text style={styles.title}>Lets Cook!</Text>
-          <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-          <Popular/>
+          <LetsCook/>
         </View>
       </ScrollView>
   </SafeAreaView>
