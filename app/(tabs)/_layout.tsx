@@ -5,7 +5,6 @@ import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
 import React, { useState } from 'react';
 import Colors from '../../constants/Colors';
-import AddRecipeModal from '../add_recipe';
 
 
 /**
@@ -21,11 +20,6 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const letsCookRecipes = 3;
-
-  const [addRecipeModalVisible, setAddRecipeModalVisible] = useState(false);
-  const toggleAddRecipeModal = () => {
-    setAddRecipeModalVisible(!addRecipeModalVisible);
-  };
 
   return (
     <View style={{flex: 1, height: '100%'}}>
@@ -74,17 +68,6 @@ export default function TabLayout() {
         options={{
           title: 'Recipes',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
-          headerRight: () => (
-            <Pressable onPress={toggleAddRecipeModal}>
-              {({ pressed }) => (
-                <FontAwesome
-                  name="plus-circle"
-                  size={25}
-                  color={Colors[colorScheme ?? 'light'].text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />
-              )}
-            </Pressable>
-          ),
         }} />
       <Tabs.Screen
         name="pantry"
@@ -106,10 +89,6 @@ export default function TabLayout() {
           ),
         }} />
     </Tabs>
-
-      <AddRecipeModal
-        visible={addRecipeModalVisible}
-        toggleModal={() => setAddRecipeModalVisible(!addRecipeModalVisible)}/>
     </View>
   );
 }

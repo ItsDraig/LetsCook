@@ -101,7 +101,8 @@ export async function AddRecipe(newRecipe: RecipeCard) {
       servings: newRecipe.servings,
       images: newRecipe.images,
       ingredients: newRecipe.ingredients,
-      instructions: newRecipe.instructions
+      instructions: newRecipe.instructions,
+      tags: newRecipe.tags
     });
     console.log("Recipe added with ID: ", docRef.id);
   } catch (e) {
@@ -122,10 +123,11 @@ const recipeConverter = {
       images: recipe.images,
       ingredients: recipe.ingredients,
       instructions: recipe.instructions,
+      tags: recipe.tags
     }
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    return new RecipeCard(data.name, data.thumbnail, data.preptime, data.cooktime, data.totaltime, data.servings, data.images, data.ingredients, data.instructions);
+    return new RecipeCard(data.name, data.thumbnail, data.preptime, data.cooktime, data.totaltime, data.servings, data.images, data.ingredients, data.instructions, data.tags);
   }
 };

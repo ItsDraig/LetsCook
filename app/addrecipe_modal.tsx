@@ -6,7 +6,8 @@ import { Stack, Button } from "@react-native-material/core";
 import { AddRecipe } from '../firebase';
 import { RecipeCard } from '../RecipeCard';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
-import IngredientTab from '../components/common/cards/IngredientTab';
+import AddIngredientTab from '../components/common/cards/AddIngredientTab';
+import CustomScrollBarScrollViewVertical from '../components/common/CustomScrollBarScrollViewVertical';
 
 interface ModalProps {
   visible: boolean;
@@ -14,7 +15,7 @@ interface ModalProps {
 }
 
 const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
-  const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']});
+  const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']});
   const [recipeImage, setRecipeImage] = useState('https://static.thenounproject.com/png/3322766-200.png');
   const [isIngredientInputClicked, setIsIngredientInputClicked] = useState(false);
   const [isInstructionInputClicked, setIsInstructionInputClicked] = useState(false);
@@ -22,6 +23,8 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   const [ingredients, setIngredients] = useState(['']);
   const [numInstructions, setNumInstructions] = useState(0);
   const [instructions, setInstructions] = useState(['']);
+  const [numTags, setNumTags] = useState(0);
+  const [tags, setTags] = useState(['']);
 
   const [canCookBG, setCanCookBG] = useState(COLORS.secondary);
   const [canCookText, setCanCookText] = useState(COLORS.gray);
@@ -36,11 +39,11 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   function ClearFields()
   {
     console.log("Clearing text fields");
-    setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: ['']})
+    setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']})
     setRecipeImage('https://static.thenounproject.com/png/3322766-200.png');
-    setNumIngredients(1);
+    setNumIngredients(0);
     setIngredients(['']);
-    setNumInstructions(1);
+    setNumInstructions(0);
     setInstructions(['']);
     toggleModal();
   }
@@ -49,19 +52,23 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   function onPressAddRecipe(newRecipe: any)
   {
     console.log("Adding recipe to firebase database");
+    if(newRecipe.recipeName == '') newRecipe.recipeName = 'Untitled Recipe';
+    if(newRecipe.preptime == '') newRecipe.preptime = '5';
+    if(newRecipe.cooktime == '') newRecipe.cooktime = '25';
+    if(newRecipe.servings == '') newRecipe.servings = '2 servings';
+    if(newRecipe.totaltime == '') newRecipe.totaltime = checkTime();
+    if(!newRecipe.ingredients?.length) newRecipe.ingredients = ['No Ingredients'];
+    if(!newRecipe.instructions?.length) newRecipe.instructions = ['No Steps', 'Try adding some!'];
     let recipe = new RecipeCard(newRecipe.recipeName, recipeImage, parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
-    parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), newRecipe.servings, [''], newRecipe.ingredients, newRecipe.instructions);
+    parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), newRecipe.servings, [''], newRecipe.ingredients, newRecipe.instructions, newRecipe.tags);
     AddRecipe(recipe);
     toggleModal();
     ClearFields();
   }
 
-  const handleImageChange = (text: '') => {
-    setRecipeImage(text);
-  };
-
   const handleIngredientInputFocus = () => {
     setIsIngredientInputClicked(true);
+    setRecipeData({...recipe});
   };
 
   const handleIngredientInputBlur = () => {
@@ -83,11 +90,13 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   const handleAddIngredient = () => {
     setNumIngredients(numIngredients + 1);
     setIngredients([...ingredients, '']);
+    setRecipeData({...recipe});
   };
 
   const handleAddInstruction = () => {
     setNumInstructions(numInstructions + 1);
     setInstructions([...instructions, '']);
+    setRecipeData({...recipe});
   };
 
   const handleIngredientChange = (text: string) => {
@@ -97,47 +106,29 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
     setIngredients(newIngredients);
   };
 
-  const handleInstructionChange = (text: string, index: number) => {
+  const handleInstructionChange = (text: string) => {
     const newInstructions = [...instructions];
-    newInstructions[index] = text;
+    newInstructions[numInstructions] = text;
     setRecipeData({...recipe, instructions: newInstructions});
     setInstructions(newInstructions);
   };
 
-  const renderIngredients = () => {
-    const inputComponents = [];
-    for (let i = 0; i < numIngredients; i++) {
-      inputComponents.push(
-        <TextInput
-          style={styles.input}
-          key={i}
-          value={recipe.ingredients[i]}
-          onChangeText={(text) => handleIngredientChange(text)}
-          placeholder={`Ingredient ${i + 1}`}
-          onFocus={handleIngredientInputFocus}
-          onBlur={handleIngredientInputBlur}
-        />
-      );
-    }
-    return inputComponents;
+  const handleIngredientPress = (index: any) => {
+    setNumIngredients(numIngredients - 1);
+    if(numIngredients <= 0) setNumIngredients(0);
+    const newIngredients = [...ingredients];
+    newIngredients.splice(index, 1);
+    setRecipeData({...recipe, ingredients: newIngredients});
+    setIngredients(newIngredients);
   };
 
-  const renderInstructions = () => {
-    const inputComponents = [];
-    for (let i = 0; i < numInstructions; i++) {
-      inputComponents.push(
-        <TextInput
-          style={styles.input}
-          key={i}
-          value={recipe.instructions[i]}
-          onChangeText={(text) => handleInstructionChange(text, i)}
-          placeholder={`Instruction ${i + 1}`}
-          onFocus={handleInstructionInputFocus}
-          onBlur={handleInstructionInputBlur}
-        />
-      );
-    }
-    return inputComponents;
+  const handleTagPress = (index: any) => {
+    setNumTags(numTags - 1);
+    if(numTags <= 0) setNumTags(0);
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+    setRecipeData({...recipe, tags: newTags});
+    setTags(newTags);
   };
 
   const onChangeImageText = (text: string) => {
@@ -147,6 +138,34 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   const onImagePress = () => {
     setRecipeImage('');
     checkFieldValues();
+  }
+
+  const checkTime = () => {
+    if(isNaN(parseInt(recipe.preptime)) && !isNaN(parseInt(recipe.cooktime)))
+    {
+      return (5 + parseInt(recipe.cooktime));
+    }
+    else if(!isNaN(parseInt(recipe.preptime)) && isNaN(parseInt(recipe.cooktime))) {
+      return (parseInt(recipe.preptime) + 25);
+    }
+    else if (isNaN(parseInt(recipe.preptime) + parseInt(recipe.cooktime))){
+      return 30;
+    }
+    else {
+      return (parseInt(recipe.preptime) + parseInt(recipe.cooktime));
+    }
+  }
+
+  const platformInstructions = (recipe: any) => {
+    if (Platform.OS === 'web') {
+      return <View style={styles.instructions}><CustomScrollBarScrollViewVertical recipe={recipe}></CustomScrollBarScrollViewVertical></View>
+    } else {
+      return <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
+                <Text style={styles.subtitleText}>Steps:</Text>
+                  {recipe.instructions.map((step:any, index:any) => (
+                    <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
+              </ScrollView>
+    }
   }
 
   return (
@@ -163,49 +182,46 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                 <Image source={{ uri: recipeImage }} style={styles.logoImage} />
                 ) : (
                   <TextInput style={styles.input} 
-                  onChangeText={(text) => onChangeImageText(text)}
-                  value={recipeImage}
-                  placeholder="Paste image URL"/>
+                    onChangeText={(text) => onChangeImageText(text)}
+                    value={recipeImage}
+                    placeholder="Paste image URL"/>
                 )}
             </TouchableOpacity>
-            <View style={styles.inputContainer}>
-              <Text style={styles.recipeName}>{recipe.recipeName}</Text>
-                <TextInput style={styles.input} 
-                  onChangeText={(text) => setRecipeData({...recipe, recipeName: text})}
-                  value={recipe.recipeName}
-                  placeholder="Recipe Name"/>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.boldText}>Servings: <Text style={styles.stepText}>{recipe.servings}</Text></Text>
-                <TextInput style={styles.input} 
+            <TextInput style={styles.recipeName} 
+              onChangeText={(text) => setRecipeData({...recipe, recipeName: text})}
+              value={recipe.recipeName}
+              placeholder="Untitled Recipe"/>
+            <View style={styles.buttonContainer}>
+              <Text style={styles.boldText}>Servings:</Text>
+                <TextInput style={[styles.stepText, {width: 75}]} 
                   onChangeText={(text) => setRecipeData({...recipe, servings: text})}
                   value={recipe.servings}
-                  placeholder="Servings"/>
+                  placeholder="2 servings"/>
             </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.boldText}>Prep Time: <Text style={styles.stepText}>{recipe.preptime} mins</Text></Text>
-                <TextInput style={styles.input} 
+            <View style={styles.buttonContainer}>
+              <Text style={styles.boldText}>Prep Time:</Text>
+                <TextInput style={[styles.stepText, {width: 25}]} 
                   onChangeText={(text) => setRecipeData({...recipe, preptime: text})}
                   value={recipe.preptime}
-                  placeholder="Prep Time (minutes)"
+                  placeholder="5"
                   keyboardType="numeric"/>
             </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.boldText}>Cook Time: <Text style={styles.stepText}>{recipe.cooktime} mins</Text></Text>
-                <TextInput style={styles.input} 
+            <View style={styles.buttonContainer}>
+              <Text style={styles.boldText}>Cook Time:</Text>
+                <TextInput style={[styles.stepText, {width: 25}]} 
                   onChangeText={(text) => setRecipeData({...recipe, cooktime: text})}
                   value={recipe.cooktime}
-                  placeholder="Cook Time (minutes)"
+                  placeholder="25"
                   keyboardType="numeric"/>
             </View>
-            <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.preptime + recipe.cooktime} mins</Text></Text>
+            <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{checkTime()} mins</Text></Text>
             <Text style={styles.subtitleText}>Ingredients:</Text>
             <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
               {recipe.ingredients.map((ingredient: any, index: any) => (
-                <IngredientTab item={ingredient}/>
+                <AddIngredientTab key={index} ingredient={ingredient} onPress={() => handleIngredientPress(index)}/>
               ))}
             </ScrollView>
-            <View style={styles.inputContainer}>
+            <View style={styles.buttonContainer}>
               <TextInput style={styles.input}
                 value={recipe.ingredients[numIngredients]}
                 onChangeText={(text) => handleIngredientChange(text)}
@@ -213,18 +229,26 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                 onFocus={handleIngredientInputFocus}
                 onBlur={handleIngredientInputBlur}/>
                   <Button title="Add ingredient" onPress={handleAddIngredient} disabled={!isIngredientInputClicked}/>
-              </View>
-            <View style={styles.inputContainer}>
-              <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
-                <Text style={styles.subtitleText}>Steps:</Text>
-                  {recipe.instructions.map((step:any, index:any) => (
-                    <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
-              </ScrollView>
             </View>
-            <View style={styles.inputContainer}>
-                {renderInstructions()}
-                <Button title="Add step" onPress={handleAddInstruction} disabled={!isInstructionInputClicked}/>
-              </View>
+            <Text style={[styles.subtitleText, {marginBottom: 5}]}>Steps:</Text>
+            {platformInstructions(recipe)}
+            <View style={styles.buttonContainer}>
+              <TextInput style={styles.input}
+                value={recipe.instructions[numInstructions]}
+                onChangeText={(text) => handleInstructionChange(text)}
+                placeholder={`Instruction`}
+                onFocus={handleInstructionInputFocus}
+                onBlur={handleInstructionInputBlur}/>
+                  <Button title="Add step" onPress={handleAddInstruction} disabled={!isInstructionInputClicked}/>
+            </View>
+            <View style={{justifyContent: 'center', alignItems: 'center', width: '100%', backgroundColor: COLORS.primary}}>
+              <Text style={styles.subtitleText}>Tags:</Text>
+            </View>
+            <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
+              {recipe.tags.map((tag: any, index: any) => (
+                <AddIngredientTab key={index} ingredient={tag} onPress={() => handleTagPress(index)}/>
+              ))}
+            </ScrollView>
             <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={ClearFields} style={styles.tab}>
                     <Text style={styles.tabText}>Cancel</Text>
@@ -233,7 +257,6 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                     <Text style={[styles.letsCookTabText, { color: canCookText }]}>Add Recipe</Text>
                 </TouchableOpacity>
             </View>
-              
           </View>
         </View>
     </Modal>
@@ -242,12 +265,11 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: Platform.OS === 'web' ? '55%' : '95%',
-    height: Platform.OS === 'web' ? '90%' : '85%',
+    width: Platform.OS === 'web' ? '75%' : '95%',
+    height: Platform.OS === 'web' ? '95%' : '85%',
     padding: SIZES.xLarge,
     backgroundColor: COLORS.primary,
     borderRadius: SIZES.medium,
-    justifyContent: "center",
     alignItems: "center",
     ...SHADOWS.medium,
     shadowColor: COLORS.white,
@@ -256,10 +278,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
   },
   instructions: {
-    height: '100%',
+    width: '50%',
     backgroundColor: COLORS.primary,
   },
   logoContainer: {
@@ -282,7 +303,7 @@ const styles = StyleSheet.create({
       height: "100%",
       borderRadius: 15,
       resizeMode: "cover",
-      borderWidth: 0
+      borderWidth: 0,
   },
   tabContainer: {
     marginTop: SIZES.xSmall - 2,
@@ -324,6 +345,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginTop: 12,
     marginBottom: 12,
+    textAlign: "center",
   },
   subtitleText: {
     fontSize: SIZES.xLarge,
@@ -338,6 +360,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginTop: 12,
     marginBottom: 12,
+    paddingRight: 10,
 },
   boldStepText: {
       fontSize: SIZES.medium - 2,
@@ -346,10 +369,12 @@ const styles = StyleSheet.create({
       paddingTop: SIZES.xSmall,
   },
   stepText: {
-      fontSize: SIZES.small + 1,
+      fontSize: SIZES.medium - 2,
       fontFamily: FONT.regular,
       color: "#B3AEC6",
-      marginBottom: SIZES.small / 2,
+      marginTop: 12,
+      marginBottom: 12,
+      textAlign: "center",
   },
 
 
@@ -366,13 +391,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     padding: 10,
-    color: 'grey'
+    color: 'grey',
+    textAlign: 'center',
   },
   inputContainer: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    alignContent: 'center',
+    textAlign: 'center',
     backgroundColor: COLORS.primary,
   },
   separator: {

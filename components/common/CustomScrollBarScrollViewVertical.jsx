@@ -41,7 +41,6 @@ const CustomScrollBarScrollViewVertical = props => {
             scrollEventThrottle={16}
           >
             <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)} style={{cursor: 'text'}}>
-            <Text style={styles.subtitleText}>Steps:</Text>
               {props.recipe.instructions?.map((step, index) => (
                 <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}
             </Pressable>

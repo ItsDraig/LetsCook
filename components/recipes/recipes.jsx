@@ -1,27 +1,28 @@
-import { React, useState, useRef } from 'react'
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Animated, Pressable } from 'react-native'
-import { useRouter } from 'expo-router'
-import { GetRecipes } from '../../firebase'
-import { DraggableFlatList } from '../common/DraggableFlatList'
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Animated, Pressable } from 'react-native';
+import { COLORS, FONT, SIZES } from '../../constants';
+import { DraggableFlatList } from '../common/DraggableFlatList';
+import { RecipeCard } from '../../RecipeCard';
 
-import styles from './letscook.style'
-import { COLORS, SIZES } from '../../constants';
-import LetsCookCard from '../common/cards/letscook/LetsCookCard';
+import styles from './recipes.style';
 
-const LetsCook = () => {
-  const router = useRouter();
+const Recipes = () => {
+  const [recipeList, setRecipeList] = useState();
+  const [addRecipeModalVisible, setAddRecipeModalVisible] = useState(false);
   var isLoading = false;
   const error = false;
-  const [recipeList, setRecipeList] = useState();
 
-  if(recipeList == null) getRecipesFromDB();
-  async function getRecipesFromDB() {
-    console.log("Getting recipes from DB");
-    var recipes = await GetRecipes();
-    isLoading = false;
-    setRecipeList(recipes);
-  }
-  
+  const toggleAddRecipeModal = () => {
+    setAddRecipeModalVisible(!addRecipeModalVisible);
+  };
+
+  const addBaseRecipe = () => {
+    var baseRecipe = new RecipeCard('Base Recipe');
+    var newRecipeList = RecipeCard[1];
+    newRecipeList.push(baseRecipe);
+    setRecipeList(newRecipeList);
+  };
+
   const platformChecker = () => {
     if (Platform.OS === 'web') {
       const [completeScrollBarWidth, setCompleteScrollBarWidth] = useState(1);
@@ -73,9 +74,9 @@ const LetsCook = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Let's Cook!</Text>
-        <TouchableOpacity>
-          <Text style={styles.headerBtn}>Show all</Text>
+        <Text style={styles.headerTitle}>Your Recipes</Text>
+        <TouchableOpacity onPress={toggleAddRecipeModal}>
+          <Text style={styles.headerBtn}>Create New Recipe</Text>
         </TouchableOpacity>
       </View>
 
@@ -94,4 +95,4 @@ const LetsCook = () => {
   )
 }
 
-export default LetsCook
+export default Recipes;

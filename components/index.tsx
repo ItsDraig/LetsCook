@@ -8,6 +8,9 @@ import Popular from "./home/popular/popular";
 // lets cook screen
 import LetsCook from "./letscook/letscook"
 
+// recipes screen
+import Recipes from "./recipes/recipes";
+
 // job details screen
 import Company from "./jobdetails/company/Company";
 import { default as JobTabs } from "./jobdetails/tabs/Tabs";
@@ -27,6 +30,7 @@ export {
   JobTabs,
   JobAbout,
   LetsCook,
+  Recipes,
   JobFooter,
   Specifics,
   NearbyJobCard

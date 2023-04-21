@@ -172,6 +172,7 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
               <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{recipe.totaltime} mins</Text></Text>
               <Text style={styles.subtitleText}>Ingredients:</Text>
               {platformIngredients(recipe)}
+              <Text style={styles.subtitleText}>Steps:</Text>
               {platformInstructions(recipe)}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={toggleModal} style={styles.tab}>
@@ -196,8 +197,8 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
 
 const styles = StyleSheet.create({
     container: {
-        width: Platform.OS === 'web' ? 650 : '95%',
-        height: Platform.OS === 'web' ? 650 : '75%',
+        width: Platform.OS === 'web' ? '35%' : '95%',
+        height: Platform.OS === 'web' ? '70%' : '75%',
         padding: SIZES.xLarge,
         backgroundColor: COLORS.primary,
         borderRadius: SIZES.medium,
