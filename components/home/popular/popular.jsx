@@ -1,33 +1,42 @@
-import { React, useState, useRef } from 'react'
+import { React, useState, useRef, useEffect, useContext } from 'react'
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Animated, Pressable } from 'react-native'
 import { useRouter } from 'expo-router'
 import { GetRecipes } from '../../../firebase'
 import { DraggableFlatList } from '../../common/DraggableFlatList'
-
 import styles from './popular.style'
 import { COLORS, SIZES } from '../../../constants';
 import PopularRecipeCard from '../../common/cards/popular/PopularRecipeCard';
 
-const Popular = () => {
+const Popular = ({ activeRecipeType, recipesNeedSorting, setRecipesNeedSorting }) => {
   const router = useRouter();
   var isLoading = false;
   const error = false;
+
   const [recipeList, setRecipeList] = useState();
 
+  useEffect(() => {
+    if (recipesNeedSorting) {
+      getRecipesFromDB();
+      setRecipesNeedSorting(false);
+    }
+  }, [recipesNeedSorting, activeRecipeType]);
+
   if(recipeList == null) getRecipesFromDB();
+
   async function getRecipesFromDB() {
     console.log("Getting recipes from DB");
     var recipes = await GetRecipes();
+
+    if (activeRecipeType !== 'All Ingredients') {
+      recipes.sort((a, b) => {
+        return a.tags[0] === activeRecipeType && b.tags[0] !== activeRecipeType ? -1 : 1;
+      });
+    }
+
     isLoading = false;
     setRecipeList(recipes);
   }
 
-  // Called by pressing a 'Search' button on the home page. Changes the content of the Flatlist.
-  const SortRecipes = () => {
-      
-  }
-
-  
   const platformChecker = () => {
     if (Platform.OS === 'web') {
       const [completeScrollBarWidth, setCompleteScrollBarWidth] = useState(1);

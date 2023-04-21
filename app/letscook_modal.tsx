@@ -162,12 +162,12 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
     };
 
     const viewStyle = {
-      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth) : (Platform.OS === 'web' ? 750 : '95%'), 
-      height: isFullscreen ? (Platform.OS === 'web' ? (screenHeight * 0.8 ) : screenHeight) : (Platform.OS === 'web' ? 750 : '75%'),
+      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth) : (Platform.OS === 'web' ? '45%' : '95%'), 
+      height: isFullscreen ? (Platform.OS === 'web' ? (screenHeight * 0.8 ) : screenHeight) : (Platform.OS === 'web' ? '70%' : '75%'),
     };
 
     const headerViewStyle = {
-      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth * .95) : (Platform.OS === 'web' ? 650 : '105%'),
+      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth * .95) : (Platform.OS === 'web' ? '95%': '105%'),
       height: isFullscreen ? (Platform.OS === 'web' ? 165 : '25%') : (Platform.OS === 'web' ? 125 : '20%'),
     }
 

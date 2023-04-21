@@ -1,17 +1,15 @@
 import React from 'react'
-import { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Image, FlatList } from 'react-native'
-import { useRouter } from 'expo-router';
 import { icons, SIZES } from '../../../constants'
 import styles from './Welcome.style'
 
 
-const recipeTypes = ["All Ingredients", "Most Ingredients", "Chinese", "Vegan", "Italian", "Mexican"];
 
-const Welcome = () => {
-  const router = useRouter();
-  const [activeRecipeType, setActiveRecipeType] = useState('All-ingredients')
-  const [text, onChangeText] = React.useState('Useless Text'); 
+
+const Welcome = ({ activeRecipeType, setActiveRecipeType, onSortRecipes }) => {
+
+  const recipeTypes = ["All Ingredients", "Most Ingredients", "Chinese", "Vegan", "Dessert", "Air Fryer"];
+
   return (
     <View>
       <View style={styles.container}>
@@ -46,6 +44,7 @@ const Welcome = () => {
             <TouchableOpacity style = {styles.tab(activeRecipeType, item)}
             onPress={() => {
               setActiveRecipeType(item);
+              onSortRecipes();
               //router.push(`/search/${item}`)
             }}>
               <Text style={styles.tabText(activeRecipeType, item)}>{item}</Text>

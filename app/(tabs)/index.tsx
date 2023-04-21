@@ -1,20 +1,26 @@
 import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-
+import React, {useState, useCallback } from 'react';
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
-
 import { COLORS, icons, images, SIZES } from '../../constants';
 import { Favorite, Popular, ScreenHeaderBtn, Welcome } from '../../components'
 import { Stack } from 'expo-router';
 
 
 export default function TabOneScreen() {
+  const [activeRecipeType, setActiveRecipeType] = useState('All Ingredients');
+  const [recipesNeedSorting, setRecipesNeedSorting] = useState(false);
+
+  const sortRecipes = useCallback(() => {
+    setRecipesNeedSorting(true);
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.welcome}>
-          <Welcome/>
-          <Popular/>
+          <Welcome activeRecipeType={activeRecipeType} setActiveRecipeType={setActiveRecipeType} onSortRecipes={sortRecipes}/>
+          <Popular activeRecipeType={activeRecipeType} recipesNeedSorting={recipesNeedSorting} setRecipesNeedSorting={setRecipesNeedSorting} />       
           <Favorite/>
         </View>
       </ScrollView>
