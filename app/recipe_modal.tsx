@@ -11,6 +11,7 @@ import FavoriteButton from '../components/common/cards/FavoriteButton';
 import * as SQLite from 'expo-sqlite';
 import { Database, SQLError, SQLTransaction } from 'expo-sqlite';
 import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
+import LetsCookModal from '../app/letscook_modal'
 
 const idb = SQLite.openDatabase('ingredients.db');
 const srdb = SQLite.openDatabase('saved_recipes.db');
@@ -107,6 +108,8 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
     const [canCookBG, setCanCookBG] = useState(COLORS.secondary);
     const [canCookText, setCanCookText] = useState(COLORS.gray);
 
+    const [modalVisible, setModalVisible] = useState(false);
+
     checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
       .then((result) => {
         if (result) {
@@ -127,6 +130,11 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
       } else {
         return <EmptyStar key={index} />;
       }
+    };
+
+    const toggleLetsCookModal = () => {
+
+      console.log("opening letscook modal");
     };
 
     return (
@@ -169,12 +177,18 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
                 <TouchableOpacity onPress={toggleModal} style={styles.tab}>
                       <Text style={styles.tabText}>Close</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={toggleModal} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
+                  <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
                       <Text style={[styles.letsCookTabText, { color: canCookText }]}>Lets Cook!</Text>
                   </TouchableOpacity>
               </View>
                 
             </View>
+            <LetsCookModal
+            recipe={recipe}
+            visible={modalVisible}
+            toggleModal={() => setModalVisible(!modalVisible)} isFavorite={false} toggleFavorite={function (): void {
+              throw new Error('Function not implemented.');
+            } }/>
           </View>
       </Modal>
     );

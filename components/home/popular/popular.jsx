@@ -22,6 +22,11 @@ const Popular = () => {
     setRecipeList(recipes);
   }
 
+  // Called by pressing a 'Search' button on the home page. Changes the content of the Flatlist.
+  const SortRecipes = () => {
+      
+  }
+
   
   const platformChecker = () => {
     if (Platform.OS === 'web') {
@@ -87,9 +92,10 @@ const Popular = () => {
         ) : error ?
         (
           <Text>Something went wrong</Text>
+          
         ) :
         (
-            platformChecker()
+            platformChecker()         
         )}
       </View>
     </View>

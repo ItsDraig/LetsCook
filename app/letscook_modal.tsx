@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useRef } from 'react';
-import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform, Animated } from 'react-native';
+import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
 import { DraggableScrollView } from '../components/common/DraggableScrollView';
 import CustomScrollBarScrollViewVertical from "../components/common/CustomScrollBarScrollViewVertical"
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
 import IngredientTab from '../components/common/cards/IngredientTab';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome5'
 import { Header } from 'react-native-elements';
 import FavoriteButton from '../components/common/cards/FavoriteButton';
 import * as SQLite from 'expo-sqlite';
@@ -105,15 +106,19 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
     const tableName = 'ingredients';
     const columnName = 'name';
 
+    const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    
     const [prevStep, setPrevStep] = useState(COLORS.secondary);
     const [prevStepText, setPrevStepText] = useState(COLORS.gray);
 
     const [nextStep, setNextStep] = useState(COLORS.secondary);
-
     const [nextStepText, setNextStepText] = useState("Next Step");
- 
+    
     const [maxIndex, setMaxIndex] = useState(9);
     const [index, setIndex] = useState(0);
+
+    
 
     const updateIndex = (amount: number) => {
         if (index == maxIndex - amount)
@@ -151,6 +156,35 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
         }
     };
 
+    const thumbnailStyle = {
+      width: isFullscreen ? (Platform.OS === 'web' ? 150 : 120) : (Platform.OS === 'web' ? 100 : 100),
+      height: isFullscreen ? (Platform.OS === 'web' ? 150 : 120) : (Platform.OS === 'web' ? 100 : 100),
+    };
+
+    const viewStyle = {
+      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth) : (Platform.OS === 'web' ? 750 : '95%'), 
+      height: isFullscreen ? (Platform.OS === 'web' ? (screenHeight * 0.8 ) : screenHeight) : (Platform.OS === 'web' ? 750 : '75%'),
+    };
+
+    const headerViewStyle = {
+      width: isFullscreen ? (Platform.OS === 'web' ? (screenWidth * 0.8 ) : screenWidth * .95) : (Platform.OS === 'web' ? 650 : '105%'),
+      height: isFullscreen ? (Platform.OS === 'web' ? 165 : '25%') : (Platform.OS === 'web' ? 125 : '20%'),
+    }
+
+    const textStyle = {
+      fontSize: isFullscreen ? SIZES.small + 6 : SIZES.small + 2,
+    };
+
+    const boldTextStyle = {
+      fontSize: isFullscreen ? SIZES.medium + 4 : SIZES.medium,
+    };
+
+    const imageStyle = {
+      justifyContent: Platform.OS === 'web' ? "normal" : "center",
+      alignItems: Platform.OS === 'web' ? "normal" : "center",
+      flexDirection: Platform.OS === 'web' ? "row" : "column"
+    }
+
     checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
       .then((result) => {
         if (result) {
@@ -178,11 +212,16 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
         visible={visible}
         onRequestClose={toggleModal}>
           <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-            <View style={styles.container}>
+            <View style={[styles.container, viewStyle]}>
               <Header 
-                containerStyle={styles.headerContainer}
+                containerStyle={[styles.headerContainer, headerViewStyle]}
+                leftComponent={
+                  <TouchableOpacity style={{ marginLeft: isFullscreen ? (Platform.OS === 'web' ? 18 : 0) : (Platform.OS === 'web' ? -30 : 0) }}onPress={() => setIsFullscreen(!isFullscreen)}>
+                    <FontAwesome name="expand-alt" size={22} color={COLORS.white} />
+                  </TouchableOpacity>
+                } 
                 centerComponent={
-                <View style={styles.logoContainer}>
+                <View style={[styles.logoContainer, thumbnailStyle]}>
                     <Image
                       source={{ uri: recipe.thumbnail }}
                       style={styles.logoImage}
@@ -193,7 +232,7 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
                   <FavoriteButton
                     isFavorite={isFavorite}
                     onPress={toggleFavorite}
-                    style={styles.favoriteButton}/>}>
+                    style={[styles.favoriteButton, { marginRight: isFullscreen ? (Platform.OS === 'web' ? 17 : 0) : (Platform.OS === 'web' ? -30 : 0)}]}/>}>
                 </Header>
               <Text style={styles.recipeName}>{recipe.name}</Text>
               <View style={styles.ratingContainer}>
@@ -205,17 +244,19 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
               <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
                 <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
                 <Text style={styles.subtitleText}>Step {index+1}:</Text>
-                <View style={{ flexDirection: 'row'}}>
+                <View style={imageStyle}> 
                     <View style={{ flex: 3 }}>
-                        <Text style={styles.boldStepText}>{recipe.instructions[index*2]} </Text>
-                        <Text style={styles.stepText} key={index}>{recipe.instructions[index*2+1]} </Text>
-                    </View>  
-                    <View style={[styles.stepContainer, { flex: 2 }]}>
+                        <Text style={[styles.boldStepText, boldTextStyle]}>{recipe.instructions[index*2]} </Text>
+                        <Text style={[styles.stepText, textStyle]} key={index}>{recipe.instructions[index*2+1]} </Text>
+                    </View> 
+                    {recipe.images[index] ? (
+                        <View style={[styles.stepContainer, { flex: 2 }]}>
                         <Image
                         source={{ uri: recipe.images[index] }}
                         style={styles.stepImage}
                         />
-                    </View>
+                      </View>
+                      ) : null}                    
                 </View>  
                 </ScrollView>
               </View>
@@ -239,8 +280,6 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
 
 const styles = StyleSheet.create({
     container: {
-        width: Platform.OS === 'web' ? 650 : '95%',
-        height: Platform.OS === 'web' ? 650 : '75%',
         padding: SIZES.xLarge,
         backgroundColor: COLORS.primary,
         borderRadius: SIZES.medium,
@@ -258,7 +297,6 @@ const styles = StyleSheet.create({
       height: '100%',
     },
     headerContainer: {
-      width: Platform.OS === 'web' ? 650 : '95%',
       height: Platform.OS === 'web' ? 85 : '20%',
       backgroundColor: COLORS.primary,
       justifyContent: "center",
@@ -287,6 +325,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderWidth: 0
     },
+    logoImage: {
+      width: "120%",
+      height: "120%",
+      borderRadius: 15,
+      resizeMode: "cover",
+      borderWidth: 0
+  },
     stepContainer: {
         width: 185,
         height: 185,
@@ -301,13 +346,6 @@ const styles = StyleSheet.create({
       marginLeft: 6,
       marginTop: 1,
       color: "#B3AEC6",
-    },
-    logoImage: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 15,
-        resizeMode: "cover",
-        borderWidth: 0
     },
     stepImage: {
         width: "100%",
