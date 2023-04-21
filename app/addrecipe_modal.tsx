@@ -8,6 +8,7 @@ import { RecipeCard } from '../RecipeCard';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
 import AddIngredientTab from '../components/common/cards/AddIngredientTab';
 import CustomScrollBarScrollViewVertical from '../components/common/CustomScrollBarScrollViewVertical';
+import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
 
 interface ModalProps {
   visible: boolean;
@@ -15,10 +16,11 @@ interface ModalProps {
 }
 
 const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
-  const [recipe, setRecipeData] = React.useState({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']});
+  const [recipe, setRecipeData] = React.useState({name: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']});
   const [recipeImage, setRecipeImage] = useState('https://static.thenounproject.com/png/3322766-200.png');
   const [isIngredientInputClicked, setIsIngredientInputClicked] = useState(false);
   const [isInstructionInputClicked, setIsInstructionInputClicked] = useState(false);
+  const [isTagInputClicked, setIsTagInputClicked] = useState(false);
   const [numIngredients, setNumIngredients] = useState(0);
   const [ingredients, setIngredients] = useState(['']);
   const [numInstructions, setNumInstructions] = useState(0);
@@ -39,7 +41,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   function ClearFields()
   {
     console.log("Clearing text fields");
-    setRecipeData({recipeName: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']})
+    setRecipeData({name: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']})
     setRecipeImage('https://static.thenounproject.com/png/3322766-200.png');
     setNumIngredients(0);
     setIngredients(['']);
@@ -87,6 +89,16 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
     }, 150);
   };
 
+  const handleTagInputFocus = () => {
+    setIsTagInputClicked(true);
+  };
+
+  const handleTagInputBlur = () => {
+    setTimeout(function() {
+      setIsTagInputClicked(false);
+    }, 150);
+  };
+
   const handleAddIngredient = () => {
     setNumIngredients(numIngredients + 1);
     setIngredients([...ingredients, '']);
@@ -96,6 +108,12 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
   const handleAddInstruction = () => {
     setNumInstructions(numInstructions + 1);
     setInstructions([...instructions, '']);
+    setRecipeData({...recipe});
+  };
+
+  const handleAddTag = () => {
+    setNumTags(numTags + 1);
+    setTags([...tags, '']);
     setRecipeData({...recipe});
   };
 
@@ -111,6 +129,13 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
     newInstructions[numInstructions] = text;
     setRecipeData({...recipe, instructions: newInstructions});
     setInstructions(newInstructions);
+  };
+
+  const handleTagChange = (text: string) => {
+    const newTags = [...tags];
+    newTags[numTags] = text;
+    setRecipeData({...recipe, tags: newTags});
+    setTags(newTags);
   };
 
   const handleIngredientPress = (index: any) => {
@@ -188,8 +213,8 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                 )}
             </TouchableOpacity>
             <TextInput style={styles.recipeName} 
-              onChangeText={(text) => setRecipeData({...recipe, recipeName: text})}
-              value={recipe.recipeName}
+              onChangeText={(text) => setRecipeData({...recipe, name: text})}
+              value={recipe.name}
               placeholder="Untitled Recipe"/>
             <View style={styles.buttonContainer}>
               <Text style={styles.boldText}>Servings:</Text>
@@ -228,7 +253,11 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                 placeholder={`Ingredient`}
                 onFocus={handleIngredientInputFocus}
                 onBlur={handleIngredientInputBlur}/>
-                  <Button title="Add ingredient" onPress={handleAddIngredient} disabled={!isIngredientInputClicked}/>
+                  <TouchableOpacity onPress={handleAddIngredient} disabled={!isIngredientInputClicked}
+                    style={[styles.tab, { backgroundColor: isIngredientInputClicked ? COLORS.tertiary : COLORS.secondary,
+                                          margin: 0}]}>
+                    <Text style={[styles.letsCookTabText, { color: isIngredientInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Ingredient</Text>
+                  </TouchableOpacity>
             </View>
             <Text style={[styles.subtitleText, {marginBottom: 5}]}>Steps:</Text>
             {platformInstructions(recipe)}
@@ -239,23 +268,38 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                 placeholder={`Instruction`}
                 onFocus={handleInstructionInputFocus}
                 onBlur={handleInstructionInputBlur}/>
-                  <Button title="Add step" onPress={handleAddInstruction} disabled={!isInstructionInputClicked}/>
+                  <TouchableOpacity onPress={handleAddInstruction} disabled={!isInstructionInputClicked}
+                    style={[styles.tab, { backgroundColor: isInstructionInputClicked ? COLORS.tertiary : COLORS.secondary,
+                                          margin: 0}]}>
+                    <Text style={[styles.letsCookTabText, { color: isInstructionInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Step</Text>
+                  </TouchableOpacity>
             </View>
-            <View style={{justifyContent: 'center', alignItems: 'center', width: '100%', backgroundColor: COLORS.primary}}>
-              <Text style={styles.subtitleText}>Tags:</Text>
-            </View>
+            <Text style={styles.subtitleText}>Tags:</Text>
             <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
               {recipe.tags.map((tag: any, index: any) => (
                 <AddIngredientTab key={index} ingredient={tag} onPress={() => handleTagPress(index)}/>
               ))}
             </ScrollView>
             <View style={styles.buttonContainer}>
+              <TextInput style={styles.input}
+                value={recipe.tags[numTags]}
+                onChangeText={(text) => handleTagChange(text)}
+                placeholder={`Tag`}
+                onFocus={handleTagInputFocus}
+                onBlur={handleTagInputBlur}/>
+                  <TouchableOpacity onPress={handleAddTag} disabled={!isTagInputClicked}
+                    style={[styles.tab, { backgroundColor: isTagInputClicked ? COLORS.tertiary : COLORS.secondary,
+                                          margin: 0}]}>
+                    <Text style={[styles.letsCookTabText, { color: isTagInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Tag</Text>
+                  </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={ClearFields} style={styles.tab}>
                     <Text style={styles.tabText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toggleModal} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
-                    <Text style={[styles.letsCookTabText, { color: canCookText }]}>Add Recipe</Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleModal} style={[styles.letsCookTab, { backgroundColor: canCookBG }]}>
+                  <Text style={[styles.letsCookTabText, { color: canCookText }]}>Add Recipe</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -278,9 +322,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.primary,
   },
   instructions: {
     width: '50%',
+    height: 100,
     backgroundColor: COLORS.primary,
   },
   logoContainer: {
@@ -306,10 +352,8 @@ const styles = StyleSheet.create({
       borderWidth: 0,
   },
   tabContainer: {
-    marginTop: SIZES.xSmall - 2,
-    marginBottom: SIZES.xSmall,
     width: "100%",
-    display: "flex",
+    height: 100,
     flexGrow: 0,
   },
   tab: {

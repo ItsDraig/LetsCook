@@ -1,27 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Animated, Pressable } from 'react-native';
 import { COLORS, FONT, SIZES } from '../../constants';
 import { DraggableFlatList } from '../common/DraggableFlatList';
 import { RecipeCard } from '../../RecipeCard';
+import MyRecipesCard from '../common/cards/myrecipes/MyRecipesCard';
+import AddRecipeModal from '../../app/addrecipe_modal';
+import RecipeModal from '../../app/recipe_modal';
 
 import styles from './recipes.style';
 
 const Recipes = () => {
-  const [recipeList, setRecipeList] = useState();
+  const [recipeList, setRecipeList] = useState([]);
   const [addRecipeModalVisible, setAddRecipeModalVisible] = useState(false);
   var isLoading = false;
   const error = false;
 
   const toggleAddRecipeModal = () => {
+    console.log("toggling add recipe modal");
     setAddRecipeModalVisible(!addRecipeModalVisible);
   };
 
-  const addBaseRecipe = () => {
-    var baseRecipe = new RecipeCard('Base Recipe');
-    var newRecipeList = RecipeCard[1];
-    newRecipeList.push(baseRecipe);
-    setRecipeList(newRecipeList);
-  };
+  useEffect(()=>{
+		var baseRecipe = new RecipeCard('Recipe Name');
+    setRecipeList([...recipeList, baseRecipe]);
+	}, [])
 
   const platformChecker = () => {
     if (Platform.OS === 'web') {
@@ -49,8 +51,8 @@ const Recipes = () => {
       return <View style={{ flex: 1, flexDirection: 'column'}}>
         <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)}>
           <DraggableFlatList data={recipeList}
-            renderItem={({item}) => <LetsCookCard item={item}/>}
-            keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
+            renderItem={({item}) => <MyRecipesCard item={item}/>}
+            keyExtractor={(item, index) => index} contentContainerStyle={{ columnGap: SIZES.medium }}
             showsHorizontalScrollIndicator={false}
             onContentSizeChange={(width, height) => {setCompleteScrollBarWidth(width);}}
             onLayout={({nativeEvent: {layout: { width }}}) => {setVisibleScrollBarWidth(width);}}
@@ -91,6 +93,10 @@ const Recipes = () => {
             platformChecker()
         )}
       </View>
+          
+      <AddRecipeModal
+        visible={addRecipeModalVisible}
+        toggleModal={() => setAddRecipeModalVisible(!addRecipeModalVisible)}/>
     </View>
   )
 }

@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
       height: '100%',
     },
     headerContainer: {
-      width: Platform.OS === 'web' ? 650 : '95%',
-      height: Platform.OS === 'web' ? 85 : '20%',
+      width: Platform.OS === 'web' ? '102%' : '95%',
+      height: Platform.OS === 'web' ? '15%' : '20%',
       backgroundColor: COLORS.primary,
       justifyContent: "center",
       alignItems: "center",

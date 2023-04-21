@@ -2,9 +2,9 @@ import React, { useRef, useState } from 'react';
 import { Text, Animated, View, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { COLORS, FONT, SHADOWS, SIZES } from '../../constants';
 import { DraggableScrollView } from './DraggableScrollView';
-import IngredientTab from './cards/IngredientTab'
+import AddIngredientTab from './cards/AddIngredientTab'
 
-const CustomScrollBarDraggableScrollViewHorizontal = props => {
+const DraggableScrollViewAddIngredient = props => {
   const [completeScrollBarWidth, setCompleteScrollBarWidth] = useState(1);
   const [visibleScrollBarWidth, setVisibleScrollBarWidth] = useState(0);
   const [showScrollBar, setShowScrollBar] = useState(false);
@@ -38,7 +38,7 @@ const CustomScrollBarDraggableScrollViewHorizontal = props => {
           onScroll={Animated.event([{nativeEvent:{contentOffset: {x: scrollIndicator}}}],{useNativeDriver: false})}
           scrollEventThrottle={16}>
             <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)} style={styles.tabContainer}>
-                {props.recipe.ingredients.map((ingredient, index) => ( <IngredientTab item={ingredient} onPress={props.onPress}/> ))}
+                {props.recipe.ingredients.map((ingredient, index) => ( <AddIngredientTab item={ingredient} onPress={props.onPress(index)}/> ))}
             </Pressable>
         </DraggableScrollView>
         <View style={{ opacity: showScrollBar ? 1 : 0 }}>
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomScrollBarDraggableScrollViewHorizontal;
+export default DraggableScrollViewAddIngredient;

@@ -28,7 +28,7 @@ function getFirstColumnAsArray(db, table, column) {
     });
   }
 
-const IngredientTab = (ingredient) => {
+const IngredientTab = (ingredient, onPress) => {
     const [pantryIngredients, setPantryIngredients] = useState([]);
     const [showCartIcon, setShowCartIcon] = useState(false);
     const containerRef = useRef(null);
@@ -37,6 +37,7 @@ const IngredientTab = (ingredient) => {
     const handleOutsideClick = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setShowCartIcon(false);
+        onPress();
       }
     };
 
