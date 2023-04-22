@@ -213,7 +213,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
           </CustomScrollBarDraggableScrollViewHorizontal>
       } else {
         return <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
-            {recipe.tagss.map((tag: any, index: any) => (
+            {recipe.tags.map((tag: any, index: any) => (
               <AddIngredientTab key={index} ingredient={tag} onPress={handleTagPress} index={index}/>
             ))}
           </ScrollView>
