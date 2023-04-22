@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, An
 import { COLORS, FONT, SIZES } from '../../constants';
 import { RecipeCard } from '../../RecipeCard';
 import AddRecipeModal from '../../app/addrecipe_modal';
+import MyRecipesCard from '../common/cards/myrecipes/MyRecipesCard';
 import CustomScrollBarDraggableFlatListHorizontal from '../common/CustomScrollBarDraggableFlatListHorizontal';
 
 import styles from './recipes.style';
@@ -28,8 +29,8 @@ const Recipes = () => {
       return <CustomScrollBarDraggableFlatListHorizontal recipeList={recipeList} cardType={'MyRecipesCard'}/>
     } else {
       return <FlatList data={recipeList}
-      renderItem={({item}) => <LetsCookCard item={item}/>}
-      keyExtractor={item => item?.name} contentContainerStyle={{ columnGap: SIZES.medium }}
+      renderItem={({item}) => <MyRecipesCard item={item}/>}
+      keyExtractor={(item, index) => index} contentContainerStyle={{ columnGap: SIZES.medium }}
       horizontal/>
     }
   }
