@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { COLORS, FONT, SIZES } from '../../../constants'
 
-const AddIngredientTab = ({ingredient, onPress}) => {
+const AddIngredientTab = ({ingredient, onPress, index}) => {
+  
+    const handlePress = () => {
+        onPress(index)
+    }
+
     return (
       <TouchableOpacity
         style = {styles.tab}
-        onPress={onPress}>
+        onPress={handlePress}>
         <Text style={styles.tabText}>{ingredient}</Text>
       </TouchableOpacity>
     )

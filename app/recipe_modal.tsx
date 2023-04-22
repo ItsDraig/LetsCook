@@ -1,8 +1,6 @@
 import React, {useState, useEffect, useRef } from 'react';
-import { Modal, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, TouchableOpacity, Platform, Animated } from 'react-native';
+import { Modal, StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { RecipeCard } from '../RecipeCard';
-import { DraggableScrollView } from '../components/common/DraggableScrollView';
-import CustomScrollBarScrollViewVertical from "../components/common/CustomScrollBarScrollViewVertical"
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
 import IngredientTab from '../components/common/cards/IngredientTab';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -10,6 +8,7 @@ import { Header } from 'react-native-elements';
 import FavoriteButton from '../components/common/cards/FavoriteButton';
 import * as SQLite from 'expo-sqlite';
 import { Database, SQLError, SQLTransaction } from 'expo-sqlite';
+import CustomScrollBarScrollViewVertical from "../components/common/CustomScrollBarScrollViewVertical"
 import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
 import LetsCookModal from '../app/letscook_modal'
 
@@ -69,7 +68,7 @@ function checkArrayInDB(db: Database, tableName: string, columnName: string, arr
 
 const platformIngredients = (recipe: any) => {
   if (Platform.OS === 'web') {
-    return <CustomScrollBarDraggableScrollViewHorizontal recipe={recipe}></CustomScrollBarDraggableScrollViewHorizontal>
+    return <CustomScrollBarDraggableScrollViewHorizontal>{recipe.ingredients.map((ingredient: any, index: any) => ( <IngredientTab item={ingredient}/> ))}</CustomScrollBarDraggableScrollViewHorizontal>
   } else {
     return <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
     {recipe.ingredients.map((ingredient: any, index: any) => (
@@ -81,7 +80,8 @@ const platformIngredients = (recipe: any) => {
 
 const platformInstructions = (recipe: any) => {
   if (Platform.OS === 'web') {
-    return <CustomScrollBarScrollViewVertical recipe={recipe}></CustomScrollBarScrollViewVertical>
+    return <CustomScrollBarScrollViewVertical>{recipe.instructions?.map((step: any, index:any) => (
+      <Text style={index % 2 === 0 ? styles.boldStepText : styles.stepText} key={index}>{step}</Text>))}</CustomScrollBarScrollViewVertical>
   } else {
     return <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
         <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
@@ -198,7 +198,9 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
 const styles = StyleSheet.create({
     container: {
         width: Platform.OS === 'web' ? '35%' : '95%',
-        height: Platform.OS === 'web' ? '70%' : '75%',
+        minWidth: Platform.OS === 'web' ? 650 : '95%',
+        height: '75%',
+        minHeight: Platform.OS === 'web' ? 650 : '75%',
         padding: SIZES.xLarge,
         backgroundColor: COLORS.primary,
         borderRadius: SIZES.medium,

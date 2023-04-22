@@ -1,10 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Text, Animated, View, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { COLORS, FONT, SHADOWS, SIZES } from '../../constants';
-import { DraggableScrollView } from './DraggableScrollView';
-import IngredientTab from './cards/IngredientTab'
+import { DraggableFlatList } from './DraggableFlatList';
+import LetsCookCard from './cards/letscook/LetsCookCard';
+import PopularRecipeCard from './cards/popular/PopularRecipeCard';
+import FavoriteRecipeCard from './cards/favorite/FavoriteRecipeCard';
+import MyRecipesCard from './cards/myrecipes/MyRecipesCard';
 
-const CustomScrollBarDraggableScrollViewHorizontal = props => {
+const CustomScrollBarDraggableFlatListHorizontal = props => {
   const [completeScrollBarWidth, setCompleteScrollBarWidth] = useState(1);
   const [visibleScrollBarWidth, setVisibleScrollBarWidth] = useState(0);
   const [showScrollBar, setShowScrollBar] = useState(false);
@@ -31,18 +34,31 @@ const CustomScrollBarDraggableScrollViewHorizontal = props => {
   });
 
   return (
-    <View style={{width: "100%", display: "flex", flexDirection: "column", flexGrow: 0, }}>
-        <DraggableScrollView horizontal centerContent showsHorizontalScrollIndicator={false}
-          onContentSizeChange={(width, height) => {setCompleteScrollBarWidth(width);}}
-          onLayout={({nativeEvent: {layout: { width }}}) => {setVisibleScrollBarWidth(width);}}
-          onScroll={Animated.event([{nativeEvent:{contentOffset: {x: scrollIndicator}}}],{useNativeDriver: false})}
-          scrollEventThrottle={16}>
-            <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)} style={styles.tabContainer}>
-              {props.children}
-            </Pressable>
-        </DraggableScrollView>
+    <View style={{ flex: 1, flexDirection: 'column'}}>
+        <Pressable onHoverIn={() => setShowScrollBar(true)} onHoverOut={() => setShowScrollBar(false)}>
+          <DraggableFlatList data={props.recipeList}
+            renderItem={({item}) => {
+                switch(props.cardType)
+                {
+                    case "LetsCookCard":
+                        return <LetsCookCard item={item} />;
+                    case "PopularRecipeCard":
+                        return <PopularRecipeCard item={item}/>;
+                    case "FavoriteRecipeCard":
+                        return <FavoriteRecipeCard item={item}/>;
+                    case "MyRecipesCard":
+                        return <MyRecipesCard item={item}/>;
+                }
+            }}
+            keyExtractor={(item, index) => index} contentContainerStyle={{ columnGap: SIZES.medium }}
+            showsHorizontalScrollIndicator={false}
+            onContentSizeChange={(width, height) => {setCompleteScrollBarWidth(width);}}
+            onLayout={({nativeEvent: {layout: { width }}}) => {setVisibleScrollBarWidth(width);}}
+            onScroll={Animated.event([{nativeEvent:{contentOffset: {x: scrollIndicator}}}],{useNativeDriver: false})}
+            scrollEventThrottle={16}/>
+        </Pressable>
         <View style={{ opacity: showScrollBar ? 1 : 0 }}>
-          <View style={{ height: 6, width: '99%', backgroundColor: '#52057b', borderRadius: 8, marginTop: SIZES.xSmall - 3}}>
+          <View style={{ height: 6, width: '99%', backgroundColor: '#52057b', borderRadius: 8, marginTop: SIZES.xSmall - 3, marginHorizontal: SIZES.small}}>
             <Animated.View style={{ height: 6, borderRadius: 8, backgroundColor: '#bc6ff1', width: scrollIndicatorSize, transform: [{ translateX: scrollIndicatorPosition }]}}/>
           </View>
         </View>
@@ -83,4 +99,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomScrollBarDraggableScrollViewHorizontal;
+export default CustomScrollBarDraggableFlatListHorizontal;
