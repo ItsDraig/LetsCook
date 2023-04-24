@@ -26,7 +26,7 @@ export class RecipeCard
         this.servings = servings ?? '1 serving';
         this.images = images ?? [''];
         this.ingredients = ingredients ?? ['No Ingredients'];
-        this.instructions = instructions ?? ['Gather ingredients', 'Mix ingredients', 'Eat food'];
+        this.instructions = instructions ?? ['No steps...', 'Try adding some!'];
         this.tags = tags ?? [''];
     }
 }

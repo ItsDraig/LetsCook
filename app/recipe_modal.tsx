@@ -68,11 +68,11 @@ function checkArrayInDB(db: Database, tableName: string, columnName: string, arr
 
 const platformIngredients = (recipe: any) => {
   if (Platform.OS === 'web') {
-    return <CustomScrollBarDraggableScrollViewHorizontal>{recipe.ingredients.map((ingredient: any, index: any) => ( <IngredientTab item={ingredient}/> ))}</CustomScrollBarDraggableScrollViewHorizontal>
+    return <CustomScrollBarDraggableScrollViewHorizontal>{recipe.ingredients.map((ingredient: any, index: any) => ( <IngredientTab key={index} item={ingredient}/> ))}</CustomScrollBarDraggableScrollViewHorizontal>
   } else {
     return <ScrollView style={styles.tabContainer} horizontal centerContent showsHorizontalScrollIndicator={false}>
     {recipe.ingredients.map((ingredient: any, index: any) => (
-      <IngredientTab item={ingredient}/>
+      <IngredientTab key={index} item={ingredient}/>
     ))}
   </ScrollView>
   }

@@ -13,107 +13,98 @@ interface ModalProps {
 }
 
 const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
-    const [recipe, setRecipeData] = React.useState({name: '', preptime: '', cooktime: '', servings: '', ingredients: [] as string[], instructions: [''], tags: [] as string[]});
+    const [recipe, setRecipeData] = React.useState({name: '', preptime: '', cooktime: '', servings: '', ingredients: [] as string[], instructions: [] as string[], tags: [] as string[]});
     const [recipeImage, setRecipeImage] = useState('https://static.thenounproject.com/png/3322766-200.png');
-    const [isIngredientInputClicked, setIsIngredientInputClicked] = useState(false);
-    const [isInstructionInputClicked, setIsInstructionInputClicked] = useState(false);
-    const [isTagInputClicked, setIsTagInputClicked] = useState(false);
     const [numIngredients, setNumIngredients] = useState(0);
     const [ingredients, setIngredients] = useState([] as string[]);
+    const [ingredientInput, setIngredientInput] = useState('');
+    const ingredientInputRef = useRef<TextInput>(null);
     const [numInstructions, setNumInstructions] = useState(0);
-    const [instructions, setInstructions] = useState(['']);
+    const [instructions, setInstructions] = useState([] as string[]);
+    const [instructionInput, setInstructionInput] = useState('');
+    const instructionInputRef = useRef<TextInput>(null);
     const [numTags, setNumTags] = useState(0);
     const [tags, setTags] = useState([] as string[]);
+    const [tagInput, setTagInput] = useState('');
+    const tagInputRef = useRef<TextInput>(null);
   
     const [canCookBG, setCanCookBG] = useState(COLORS.secondary);
     const [canCookText, setCanCookText] = useState(COLORS.gray);
 
     // Checks to see if all fields are filled out
     const checkFieldValues = () => {
-      setCanCookText(COLORS.white);
-      setCanCookBG(COLORS.tertiary);
+      if(recipe.name != '' && recipe.ingredients.length > 0 && recipe.instructions.length > 0)
+      {
+        setCanCookText(COLORS.white);
+        setCanCookBG(COLORS.tertiary);
+      }
+      else
+      {
+        setCanCookBG(COLORS.secondary);
+        setCanCookText(COLORS.gray);
+      }
     }
 
     // Clears all fields
     function ClearFields()
     {
       console.log("Clearing text fields");
-      setRecipeData({name: '', preptime: '', cooktime: '', servings: '', ingredients: [''], instructions: [''], tags: ['']})
+      setRecipeData({name: '', preptime: '', cooktime: '', servings: '', ingredients: [] as string[], instructions: [] as string[], tags: [] as string[]})
       setRecipeImage('https://static.thenounproject.com/png/3322766-200.png');
       setNumIngredients(0);
       setIngredients([] as string[]);
       setNumInstructions(0);
-      setInstructions(['']);
+      setInstructions([] as string[]);
+      setInstructionInput('');
       setNumTags(0);
       setTags([] as string[]);
+      setTagInput('');
+      setCanCookBG(COLORS.secondary);
+      setCanCookText(COLORS.gray);
       toggleModal();
     }
 
     // Creates a new RecipeCard and adds it to the database
-    function onPressAddRecipe(newRecipe: any)
+    function onPressAddRecipe()
     {
       console.log("Adding recipe to firebase database");
-      if(newRecipe.recipeName == '') newRecipe.recipeName = 'Untitled Recipe';
-      if(newRecipe.preptime == '') newRecipe.preptime = '5';
-      if(newRecipe.cooktime == '') newRecipe.cooktime = '25';
-      if(newRecipe.servings == '') newRecipe.servings = '2 servings';
-      if(newRecipe.totaltime == '') newRecipe.totaltime = checkTime();
-      if(!newRecipe.ingredients?.length) newRecipe.ingredients = ['No Ingredients'];
-      if(!newRecipe.instructions?.length) newRecipe.instructions = ['No Steps', 'Try adding some!'];
-      let recipe = new RecipeCard(newRecipe.recipeName, recipeImage, parseInt(newRecipe.preptime), parseInt(newRecipe.cooktime),
-      parseInt(newRecipe.preptime) + parseInt(newRecipe.cooktime), newRecipe.servings, [''], newRecipe.ingredients, newRecipe.instructions, newRecipe.tags);
-      AddRecipe(recipe);
-      toggleModal();
+      if(recipe.name == '') recipe.name = 'Untitled Recipe';
+      if(recipeImage == 'https://static.thenounproject.com/png/3322766-200.png') setRecipeImage('');
+      if(recipe.preptime == '') recipe.preptime = '5';
+      if(recipe.cooktime == '') recipe.cooktime = '25';
+      if(recipe.servings == '') recipe.servings = '2 servings';
+      var totaltime = checkTime();
+      if(recipe.ingredients?.length < 1) recipe.ingredients = ['No Ingredients...'];
+      if(recipe.instructions?.length < 1) recipe.instructions = ['No Steps...', 'Try adding some!'];
+      if(recipe.tags?.length < 1) recipe.tags = ['Untagged'];
+      let newRecipe = new RecipeCard(recipe.name, recipeImage, parseInt(recipe.preptime), parseInt(recipe.cooktime),
+                    totaltime, recipe.servings, [''], recipe.ingredients, recipe.instructions, recipe.tags);
+      console.log(newRecipe);
+      AddRecipe(newRecipe);
       ClearFields();
     }
 
-    const handleIngredientInputFocus = () => {
-      setIsIngredientInputClicked(true);
-      setRecipeData({...recipe});
-    };
-
-    const handleIngredientInputBlur = () => {
-      setTimeout(function() {
-        setIsIngredientInputClicked(false);
-      }, 150);
-    };
-
-    const handleInstructionInputFocus = () => {
-      setIsInstructionInputClicked(true);
-    };
-
-    const handleInstructionInputBlur = () => {
-      setTimeout(function() {
-        setIsInstructionInputClicked(false);
-      }, 150);
-    };
-
-    const handleTagInputFocus = () => {
-      setIsTagInputClicked(true);
-    };
-
-    const handleTagInputBlur = () => {
-      setTimeout(function() {
-        setIsTagInputClicked(false);
-      }, 150);
-    };
-
     const handleAddIngredient = () => {
       setNumIngredients(numIngredients + 1);
-      setIngredients([...ingredients, '']);
-      setRecipeData({...recipe});
+      setIngredientInput('');
+      ingredientInputRef.current?.focus();
+      checkFieldValues();
     };
 
     const handleAddInstruction = () => {
       setNumInstructions(numInstructions + 1);
-      setInstructions([...instructions, '']);
-      setRecipeData({...recipe});
+      setInstructionInput('');
+      instructionInputRef.current?.focus();
+      console.log(instructions);
+      checkFieldValues();
     };
 
     const handleAddTag = () => {
       setNumTags(numTags + 1);
-      setTags([...tags, '']);
-      setRecipeData({...recipe});
+      setTagInput('');
+      setRecipeData({...recipe, tags: tags});
+      tagInputRef.current?.focus();
+      checkFieldValues();
     };
 
     const handleIngredientChange = (text: string) => {
@@ -121,6 +112,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
       newIngredients[numIngredients] = text;
       setRecipeData({...recipe, ingredients: newIngredients});
       setIngredients(newIngredients);
+      setIngredientInput(text);
     };
 
     const handleInstructionChange = (text: string) => {
@@ -128,6 +120,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
       newInstructions[numInstructions] = text;
       setRecipeData({...recipe, instructions: newInstructions});
       setInstructions(newInstructions);
+      setInstructionInput(text);
     };
 
     const handleTagChange = (text: string) => {
@@ -135,6 +128,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
       newTags[numTags] = text;
       setRecipeData({...recipe, tags: newTags});
       setTags(newTags);
+      setTagInput(text);
     };
 
     const handleIngredientPress = (index: any) => {
@@ -142,8 +136,8 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
       if(numIngredients <= 0) setNumIngredients(0);
       const newIngredients = [...ingredients];
       newIngredients.splice(index, 1);
-      setRecipeData({...recipe, ingredients: newIngredients});
       setIngredients(newIngredients);
+      setRecipeData({...recipe, ingredients: newIngredients});
     };
 
     const handleTagPress = (index: any) => {
@@ -230,7 +224,7 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
             <View style={styles.container}>
               <TouchableOpacity style={[styles.logoContainer, {zIndex: 2, backgroundColor: COLORS.primary}]} onPress={onImagePress}>
                 {recipeImage ? (
-                  <Image source={{ uri: recipeImage }} style={styles.logoImage} />
+                  <Image source={{ uri: recipeImage }} style={[styles.logoImage, {borderWidth: 1, borderColor: 'white'}]} />
                   ) : (
                     <TextInput style={styles.input} 
                       onChangeText={(text) => onChangeImageText(text)}
@@ -238,20 +232,20 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
                       placeholder="Paste image URL"/>
                   )}
               </TouchableOpacity>
-              <TextInput style={styles.recipeName} 
+              <TextInput style={[styles.recipeName, {borderWidth: 1, borderColor: 'white'}]} 
                 onChangeText={(text) => setRecipeData({...recipe, name: text})}
                 value={recipe.name}
                 placeholder="Untitled Recipe"/>
               <View style={styles.buttonContainer}>
                 <Text style={styles.boldText}>Servings:</Text>
-                  <TextInput style={[styles.stepText, {width: 75}]} 
+                  <TextInput style={[styles.stepText, {width: 100, borderWidth: 1, borderColor: 'white', padding: 3}]} 
                     onChangeText={(text) => setRecipeData({...recipe, servings: text})}
                     value={recipe.servings}
                     placeholder="2 servings"/>
               </View>
               <View style={styles.buttonContainer}>
                 <Text style={styles.boldText}>Prep Time:</Text>
-                  <TextInput style={[styles.stepText, {width: 25}]} 
+                  <TextInput style={[styles.stepText, {width: 50, borderWidth: 1, borderColor: 'white', padding: 3}]} 
                     onChangeText={(text) => setRecipeData({...recipe, preptime: text})}
                     value={recipe.preptime}
                     placeholder="5"
@@ -259,61 +253,64 @@ const AddRecipeModal = ({visible, toggleModal }: ModalProps) => {
               </View>
               <View style={styles.buttonContainer}>
                 <Text style={styles.boldText}>Cook Time:</Text>
-                  <TextInput style={[styles.stepText, {width: 25}]} 
+                  <TextInput style={[styles.stepText, {width: 50, borderWidth: 1, borderColor: 'white', padding: 3}]} 
                     onChangeText={(text) => setRecipeData({...recipe, cooktime: text})}
                     value={recipe.cooktime}
                     placeholder="25"
                     keyboardType="numeric"/>
               </View>
-              <Text style={styles.boldText}>Total Time: <Text style={styles.stepText}>{checkTime()} mins</Text></Text>
+              <Text style={styles.boldText}>Total Time: <Text style={[styles.stepText, {paddingLeft: 5}]}>{checkTime()} mins</Text></Text>
               <Text style={styles.subtitleText}>Ingredients:</Text>
               {platformIngredients(recipe)}
               <View style={styles.buttonContainer}>
                 <TextInput style={styles.input}
-                  value={recipe.ingredients[numIngredients]}
+                  ref={ingredientInputRef}
+                  value={ingredientInput}
                   onChangeText={(text) => handleIngredientChange(text)}
                   placeholder={`Ingredient`}
-                  onFocus={handleIngredientInputFocus}
-                  onBlur={handleIngredientInputBlur}/>
-                    <TouchableOpacity onPress={handleAddIngredient} disabled={!isIngredientInputClicked}
-                      style={[styles.tab, { backgroundColor: isIngredientInputClicked ? COLORS.tertiary : COLORS.secondary,
+                  blurOnSubmit={false}
+                  onSubmitEditing={handleAddIngredient}/>
+                    <TouchableOpacity onPress={handleAddIngredient} disabled={!ingredientInput}
+                      style={[styles.tab, { backgroundColor: ingredientInput ? COLORS.tertiary : COLORS.secondary,
                                             margin: 0}]}>
-                      <Text style={[styles.letsCookTabText, { color: isIngredientInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Ingredient</Text>
+                      <Text style={[styles.letsCookTabText, { color: ingredientInput ? COLORS.primary : COLORS.gray, }]}>Add Ingredient</Text>
                     </TouchableOpacity>
               </View>
               <Text style={[styles.subtitleText, {marginBottom: 5}]}>Steps:</Text>
               {platformInstructions(recipe)}
               <View style={styles.buttonContainer}>
                 <TextInput style={styles.input}
-                  value={recipe.instructions[numInstructions]}
+                  ref={instructionInputRef}
+                  value={instructionInput}
                   onChangeText={(text) => handleInstructionChange(text)}
-                  placeholder={`Instruction`}
-                  onFocus={handleInstructionInputFocus}
-                  onBlur={handleInstructionInputBlur}/>
-                    <TouchableOpacity onPress={handleAddInstruction} disabled={!isInstructionInputClicked}
-                      style={[styles.tab, { backgroundColor: isInstructionInputClicked ? COLORS.tertiary : COLORS.secondary, margin: 0}]}>
-                      <Text style={[styles.letsCookTabText, { color: isInstructionInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Step</Text>
+                  placeholder={numInstructions % 2 === 0 ? 'Instruction Title' : `Instruction`}
+                  blurOnSubmit={false}
+                  onSubmitEditing={handleAddInstruction}/>
+                    <TouchableOpacity onPress={handleAddInstruction} disabled={!instructionInput}
+                      style={[styles.tab, { backgroundColor: instructionInput ? COLORS.tertiary : COLORS.secondary, margin: 0}]}>
+                      <Text style={[styles.letsCookTabText, { color: instructionInput ? COLORS.primary : COLORS.gray, }]}>Add Step</Text>
                     </TouchableOpacity>
               </View>
               <Text style={styles.subtitleText}>Tags:</Text>
               {platformTags(recipe)}
               <View style={styles.buttonContainer}>
                 <TextInput style={styles.input}
-                  value={recipe.tags[numTags]}
+                  ref={tagInputRef}
+                  value={tagInput}
                   onChangeText={(text) => handleTagChange(text)}
                   placeholder={`Tag`}
-                  onFocus={handleTagInputFocus}
-                  onBlur={handleTagInputBlur}/>
-                    <TouchableOpacity onPress={handleAddTag} disabled={!isTagInputClicked}
-                      style={[styles.tab, { backgroundColor: isTagInputClicked ? COLORS.tertiary : COLORS.secondary, margin: 0}]}>
-                      <Text style={[styles.letsCookTabText, { color: isTagInputClicked ? COLORS.primary : COLORS.gray, }]}>Add Tag</Text>
+                  blurOnSubmit={false}
+                  onSubmitEditing={handleAddTag}/>
+                    <TouchableOpacity onPress={handleAddTag} disabled={!tagInput}
+                      style={[styles.tab, { backgroundColor: tagInput ? COLORS.tertiary : COLORS.secondary, margin: 0}]}>
+                      <Text style={[styles.letsCookTabText, { color: tagInput ? COLORS.primary : COLORS.gray, }]}>Add Tag</Text>
                     </TouchableOpacity>
               </View>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={ClearFields} style={styles.tab}>
                       <Text style={styles.tabText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={toggleModal} style={[styles.tab, { backgroundColor: canCookBG }]}>
+                <TouchableOpacity onPress={onPressAddRecipe} style={[styles.tab, { backgroundColor: canCookBG }]}>
                     <Text style={[styles.letsCookTabText, { color: canCookText }]}>Add Recipe</Text>
                 </TouchableOpacity>
               </View>
