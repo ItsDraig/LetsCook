@@ -31,7 +31,7 @@ const CustomScrollBarScrollViewVertical = props => {
     return (
       <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
           <ScrollView
-            style={styles.instructions}
+            style={props.style}
             centerContent
             contentContainerStyle={{ paddingRight: 14 }}
             showsVerticalScrollIndicator={false}
@@ -55,7 +55,6 @@ const CustomScrollBarScrollViewVertical = props => {
 
 const styles = StyleSheet.create({
     instructions: {
-      height: '100%',
     },
     subtitleText: {
         fontSize: SIZES.xLarge,

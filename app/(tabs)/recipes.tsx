@@ -4,7 +4,6 @@ import { Recipes } from '../../components'
 import { COLORS, icons, images, SIZES } from '../../constants';
 
 export default function TabThreeScreen() {
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -12,7 +11,7 @@ export default function TabThreeScreen() {
           <Recipes/>
         </View>
       </ScrollView>
-  </SafeAreaView>
+    </SafeAreaView>
   );
 }
 

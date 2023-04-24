@@ -6,6 +6,7 @@ import LetsCookCard from './cards/letscook/LetsCookCard';
 import PopularRecipeCard from './cards/popular/PopularRecipeCard';
 import FavoriteRecipeCard from './cards/favorite/FavoriteRecipeCard';
 import MyRecipesCard from './cards/myrecipes/MyRecipesCard';
+import PantryIngredientCard from './cards/pantry/PantryIngredientCard';
 
 const CustomScrollBarDraggableFlatListHorizontal = props => {
   const [completeScrollBarWidth, setCompleteScrollBarWidth] = useState(1);
@@ -48,6 +49,8 @@ const CustomScrollBarDraggableFlatListHorizontal = props => {
                         return <FavoriteRecipeCard item={item}/>;
                     case "MyRecipesCard":
                         return <MyRecipesCard item={item}/>;
+                    case "PantryIngredientCard":
+                        return <PantryIngredientCard item={item}/>;
                 }
             }}
             keyExtractor={(item, index) => index} contentContainerStyle={{ columnGap: SIZES.medium }}

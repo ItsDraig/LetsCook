@@ -46,7 +46,7 @@ const Recipes = () => {
 
       <View style={styles.cardsContainer}>
         {isLoading ? (
-          <ActivityIndicator size="large" colors={COLORS.primary} />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         ) : error ?
         (
           <Text>Something went wrong</Text>

@@ -11,6 +11,9 @@ import LetsCook from "./letscook/letscook"
 // recipes screen
 import Recipes from "./recipes/recipes";
 
+// pantry screen
+import Pantry from "./pantry/pantry";
+
 // job details screen
 import Company from "./jobdetails/company/Company";
 import { default as JobTabs } from "./jobdetails/tabs/Tabs";
@@ -31,6 +34,7 @@ export {
   JobAbout,
   LetsCook,
   Recipes,
+  Pantry,
   JobFooter,
   Specifics,
   NearbyJobCard
