@@ -110,7 +110,8 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
 
     const [modalVisible, setModalVisible] = useState(false);
 
-    checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
+    useEffect(() => {
+      checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
       .then((result) => {
         if (result) {
           console.log('All ingredients exist in the database');
@@ -121,6 +122,7 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
         }
       })
       .catch((error) => console.error(error));
+    }, []);
 
     const renderStar = (index: number) => {
       if (index < filledStars) {
