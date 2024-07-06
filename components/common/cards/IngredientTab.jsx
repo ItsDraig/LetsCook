@@ -1,39 +1,16 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
 import { COLORS, FONT, SIZES } from '../../../constants'
-import * as SQLite from 'expo-sqlite';
 import { FontAwesome5 } from '@expo/vector-icons'; 
-
-const idb = SQLite.openDatabase('ingredients.db');
+import { GetIngredients } from '../../../firebase';
 
 //const pantryIngredients = ["Vegetable oil", "1 cup soy milk", "1 teaspoon garlic powder", "1 teaspoon onion powder"];
-
-function getFirstColumnAsArray(db, table, column) {
-    return new Promise((resolve, reject) => {
-      db.transaction((tx) => {
-        tx.executeSql(`SELECT ${column} FROM ${table}`, [], (tx, results) => {
-          const rows = results.rows;
-          const resultArray = [];
-  
-          for (let i = 0; i < rows.length; i++) {
-            const { name } = rows.item(i); // extract the name property from the object
-            resultArray.push(name);
-          }
-  
-          resolve(resultArray);
-        }, (error) => {
-          reject(error);
-        });
-      });
-    });
-  }
 
 const IngredientTab = (ingredient) => {
     const [pantryIngredients, setPantryIngredients] = useState([]);
     const [showCartIcon, setShowCartIcon] = useState(false);
     const containerRef = useRef(null);
     
-
     const handleOutsideClick = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setShowCartIcon(false);
@@ -45,13 +22,18 @@ const IngredientTab = (ingredient) => {
     };
 
     useEffect(() => {
-        const tableName = 'ingredients';
-        const columnName = 'name';
-    
-        getFirstColumnAsArray(idb, tableName, columnName)
-          .then((result) => setPantryIngredients(result))
-          .catch((error) => console.error(error));
-      }, []);
+        handleGettingIngredientsList();
+    }, []);
+
+    async function handleGettingIngredientsList()
+    {
+      const IngredientList = await GetIngredients();
+      const ingredientsList = [];
+      IngredientList.forEach((ingredient) => {
+        ingredientsList.push(ingredient.quantity + " " + ingredient.name);
+      });
+      setPantryIngredients(ingredientsList);
+    }
 
     useEffect(() => {
       if (Platform.OS === 'web')

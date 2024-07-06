@@ -9,12 +9,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5'
 import { Header } from 'react-native-elements';
 import FavoriteButton from '../components/common/cards/FavoriteButton';
-import * as SQLite from 'expo-sqlite';
-import { Database, SQLError, SQLTransaction } from 'expo-sqlite';
 import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
-
-const idb = SQLite.openDatabase('ingredients.db');
-const srdb = SQLite.openDatabase('saved_recipes.db');
+import { Ingredient } from '../Ingredient';
+import { CheckIngredients } from '../firebase';
 
 interface ModalProps {
     recipe: RecipeCard;
@@ -22,11 +19,6 @@ interface ModalProps {
     isFavorite: boolean;
     toggleFavorite: () => void;
     toggleModal: () => void;
-}
-
-interface DatabaseRow {
-  ingredients: string;
-  quantity: string; //change to int
 }
 
 const FilledStar = () => (
@@ -46,26 +38,6 @@ const EmptyStar = () => (
     <Icon name="star-o" color="#f1c40f" size={20} />
   </View>
 );
-
-function checkArrayInDB(db: Database, tableName: string, columnName: string, arr: string[]): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT COUNT(*) FROM ${tableName} WHERE ${columnName} IN (${arr.map(() => '?').join(',')})`,
-        arr,
-        (tx, results) => {
-          const rows = results.rows;
-          const count = rows && rows.length > 0 ? rows.item(0)['COUNT(*)'] : 0;
-          resolve(count === arr.length);
-        },
-        (tx: SQLTransaction, error: SQLError) => {
-          console.error(error);
-          return true; // rollback transaction
-        }
-      );
-    });
-  });
-}
 
 const platformIngredients = (recipe: any) => {
   if (Platform.OS === 'web') {
@@ -103,9 +75,6 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
     const filledStars = Math.floor(0); 
     const hasHalfStar = 0 - filledStars >= 0.5;
 
-    const tableName = 'ingredients';
-    const columnName = 'name';
-
     const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
     const [isFullscreen, setIsFullscreen] = useState(false);
     
@@ -117,8 +86,6 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
     
     const [maxIndex, setMaxIndex] = useState(9);
     const [index, setIndex] = useState(0);
-
-    
 
     const updateIndex = (amount: number) => {
         if (index == maxIndex - amount)
@@ -185,15 +152,17 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
       flexDirection: Platform.OS === 'web' ? "row" : "column"
     }
 
-    checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
-      .then((result) => {
-        if (result) {
-          console.log('All ingredients exist in the database');
-        } else {
-          console.log('Some ingredients do not exist in the database');
-        }
-      })
-      .catch((error) => console.error(error));
+    useEffect(() => {
+      handleCheckIngredients(recipe.ingredients)
+    }, []);
+
+    async function handleCheckIngredients(ingredientList: Ingredient[])
+    {
+      if (await CheckIngredients(ingredientList))
+        console.log('All ingredients exist in the database');
+      else
+        console.log('Some ingredients do not exist in the database');
+    }
 
     const renderStar = (index: number) => {
       if (index < filledStars) {
@@ -244,7 +213,7 @@ const LetsCookModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal
               <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10}}>
                 <ScrollView style={styles.instructions} centerContent contentContainerStyle={{ paddingRight: 14 }}>
                 <Text style={styles.subtitleText}>Step {index+1}:</Text>
-                <View style={imageStyle}> 
+                <View> 
                     <View style={{ flex: 3 }}>
                         <Text style={[styles.boldStepText, boldTextStyle]}>{recipe.instructions[index*2]} </Text>
                         <Text style={[styles.stepText, textStyle]} key={index}>{recipe.instructions[index*2+1]} </Text>

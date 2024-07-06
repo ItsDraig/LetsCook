@@ -2,33 +2,9 @@ import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
 import RecipeModal from '../../../../app/recipe_modal'
-import TabLayout from '../../../../app/(tabs)/_layout'
 import styles from './popularrecipecard.style'
-import * as SQLite from 'expo-sqlite';
 import { FontAwesome } from '@expo/vector-icons'; 
-
-const idb = SQLite.openDatabase('ingredients.db');
-
-function getFirstColumnAsArray(db, table, column) {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(`SELECT ${column} FROM ${table}`, [], (tx, results) => {
-        const rows = results.rows;
-        const resultArray = [];
-
-        for (let i = 0; i < rows.length; i++) {
-          const { name } = rows.item(i); // extract the name property from the object
-          resultArray.push(name);
-        }
-
-        resolve(resultArray);
-      }, (error) => {
-        reject(error);
-      });
-    });
-  });
-}
-
+import { GetIngredients } from '../../../../firebase.ts';
 
 const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
   const [size, setSize] = useState(85);
@@ -44,13 +20,18 @@ const PopularRecipeCard = ({ item, selectedRecipe, handleCardPress}) => {
   const recipeIngredientsCount = item.ingredients.filter((ingredient) => pantryIngredients.includes(ingredient)).length;
 
   useEffect(() => {
-    const tableName = 'ingredients';
-    const columnName = 'name';
-
-    getFirstColumnAsArray(idb, tableName, columnName)
-      .then((result) => setPantryIngredients(result))
-      .catch((error) => console.error(error));
+    handleGettingIngredientsList();
   }, []);
+
+  async function handleGettingIngredientsList()
+  {
+    const IngredientList = await GetIngredients();
+    const ingredientsList = [];
+    IngredientList.forEach((ingredient) => {
+      ingredientsList.push(ingredient.quantity + " " + ingredient.name);
+    });
+    setPantryIngredients(ingredientsList);
+  }
 
   useEffect(() => {
     ingredientPercentage.setValue((recipeIngredientsCount / item.ingredients.length) * 100 + 20); // remove the + 20 but change recipe card somehow

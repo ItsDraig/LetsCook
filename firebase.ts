@@ -2,9 +2,10 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { applicationDefault, cert } from 'firebase-admin/app';
-import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs, DocumentData, QueryDocumentSnapshot, SnapshotOptions, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, Timestamp, FieldValue, collection, addDoc, getDocs, DocumentData, QueryDocumentSnapshot, SnapshotOptions, doc, getDoc, deleteDoc, query, where } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { RecipeCard } from "./RecipeCard";
+import { Ingredient } from "./Ingredient";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -76,6 +77,66 @@ signInWithEmailAndPassword(auth, email, password)
     const errorMessage = error.message;
   });
 
+// Gets a list of a user's ingredients from the database
+export async function GetIngredients() {
+  const ingredientList: Ingredient[] = [];
+  const ref = collection(db, 'ingredients').withConverter(ingredientConverter);
+  const querySnapshot = await getDocs(ref);
+  querySnapshot.forEach((doc) => {
+    const ingredient = doc.data();
+    ingredientList.push(ingredient);
+    console.log(ingredient.name);
+  });
+  return ingredientList;
+}
+
+// Checks to see whether the database contains all ingredients within given list
+export async function CheckIngredients(ingredientList: Ingredient[]) {
+  const ref = collection(db, 'ingredients').withConverter(ingredientConverter);
+  const querySnapshot = await getDocs(ref);
+  querySnapshot.forEach((doc) => {
+    const ingredient = doc.data();
+    if (!ingredientList.includes(ingredient)) return false;
+  });
+  return true;
+}
+
+// Adds a new ingredient to the database
+export async function AddIngredient(newIngredient: Ingredient) {
+  try {
+    const docRef = await addDoc(collection(db, 'ingredients'), {
+      name: newIngredient.name,
+      quantity: newIngredient.quantity,
+      vegetarian: newIngredient.vegetarian,
+      vegan: newIngredient.vegan,
+      glutenfree: newIngredient.glutenfree
+    });
+    console.log("Ingredient added with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding ingredient: ", e);
+  }
+}
+
+// Deletes an ingredient from the database
+export async function DeleteIngredient(ingredientToDelete: Ingredient) {
+  try {
+    const q = query(collection(db, 'ingredients').withConverter(ingredientConverter), 
+      where("name", "==", ingredientToDelete.name),
+      where("quantity", "==", ingredientToDelete.quantity));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      const ingredient = doc.data();
+      if (ingredient.name == ingredientToDelete.name && ingredient.quantity == ingredientToDelete.quantity)
+      {
+        deleteDoc(doc.ref);
+      }
+    });
+    console.log(`Ingredient ${ingredientToDelete.name} removed from database.`);
+  } catch (e) {
+    console.error(`Error removing ingredient ${ingredientToDelete.name} from database.`);
+  }
+}
+
 // Gets a list of recipes all from the database
 export async function GetRecipes() {
   const recipeList: RecipeCard[] = [];
@@ -129,5 +190,22 @@ const recipeConverter = {
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
     return new RecipeCard(data.name, data.thumbnail, data.preptime, data.cooktime, data.totaltime, data.servings, data.images, data.ingredients, data.instructions, data.tags);
+  }
+};
+
+// Ingredient converter function for Firestore
+const ingredientConverter = {
+  toFirestore(ingredient: Ingredient): DocumentData {
+    return {
+      name: ingredient.name,
+      quantity: ingredient.quantity,
+      vegetarian: ingredient.vegetarian,
+      vegan: ingredient.vegan,
+      glutenfree: ingredient.glutenfree
+    }
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    const data = snapshot.data(options);
+    return new Ingredient(data.name, data.quantity, data.vegetarian, data.vegan, data.glutenfree);
   }
 };

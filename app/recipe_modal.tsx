@@ -6,14 +6,11 @@ import IngredientTab from '../components/common/cards/IngredientTab';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Header } from 'react-native-elements';
 import FavoriteButton from '../components/common/cards/FavoriteButton';
-import * as SQLite from 'expo-sqlite';
-import { Database, SQLError, SQLTransaction } from 'expo-sqlite';
 import CustomScrollBarScrollViewVertical from "../components/common/CustomScrollBarScrollViewVertical"
 import CustomScrollBarDraggableScrollViewHorizontal from '../components/common/CustomScrollBarDraggableScrollViewHorizontal';
 import LetsCookModal from '../app/letscook_modal'
-
-const idb = SQLite.openDatabase('ingredients.db');
-const srdb = SQLite.openDatabase('saved_recipes.db');
+import { Ingredient } from '../Ingredient';
+import { CheckIngredients } from '../firebase';
 
 interface ModalProps {
     recipe: RecipeCard;
@@ -21,11 +18,6 @@ interface ModalProps {
     isFavorite: boolean;
     toggleFavorite: () => void;
     toggleModal: () => void;
-}
-
-interface DatabaseRow {
-  ingredients: string;
-  quantity: string; //change to int
 }
 
 const FilledStar = () => (
@@ -45,26 +37,6 @@ const EmptyStar = () => (
     <Icon name="star-o" color="#f1c40f" size={20} />
   </View>
 );
-
-function checkArrayInDB(db: Database, tableName: string, columnName: string, arr: string[]): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT COUNT(*) FROM ${tableName} WHERE ${columnName} IN (${arr.map(() => '?').join(',')})`,
-        arr,
-        (tx, results) => {
-          const rows = results.rows;
-          const count = rows && rows.length > 0 ? rows.item(0)['COUNT(*)'] : 0;
-          resolve(count === arr.length);
-        },
-        (tx: SQLTransaction, error: SQLError) => {
-          console.error(error);
-          return true; // rollback transaction
-        }
-      );
-    });
-  });
-}
 
 const platformIngredients = (recipe: any) => {
   if (Platform.OS === 'web') {
@@ -111,18 +83,20 @@ const RecipeModal = ({recipe, visible, isFavorite, toggleFavorite, toggleModal }
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
-      checkArrayInDB(idb, tableName, columnName, recipe.ingredients)
-      .then((result) => {
-        if (result) {
-          console.log('All ingredients exist in the database');
-          setCanCookText(COLORS.white);
-          setCanCookBG(COLORS.tertiary);
-        } else {
-          console.log('Some ingredients do not exist in the database');
-        }
-      })
-      .catch((error) => console.error(error));
+      handleCheckIngredients(recipe.ingredients)
     }, []);
+
+    async function handleCheckIngredients(ingredientList: Ingredient[])
+    {
+      if (await CheckIngredients(ingredientList))
+      {
+        console.log('All ingredients exist in the database');
+        setCanCookText(COLORS.white);
+        setCanCookBG(COLORS.tertiary);
+      } else {
+        console.log('Some ingredients do not exist in the database');
+      }
+    }
 
     const renderStar = (index: number) => {
       if (index < filledStars) {

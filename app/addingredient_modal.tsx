@@ -1,22 +1,14 @@
 import React, {useState, useEffect, useRef } from 'react';
 import { Modal, StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Platform, TextInput } from 'react-native';
 import { COLORS, FONT, SHADOWS, SIZES } from "../constants";
-import * as SQLite from 'expo-sqlite';
 import { ActivityIndicator } from '@react-native-material/core';
-import { SQLError } from 'expo-sqlite';
+import { AddIngredient } from '../firebase';
+import { Ingredient } from '../Ingredient';
 
 interface ModalProps {
     visible: boolean;
     toggleModal: () => void;
 }
-
-interface Ingredient {
-    id: number;
-    name: string;
-    quantity: string;
-}
-  
-const db = SQLite.openDatabase('ingredients.db');
 
 const AddIngredientModal = ({visible, toggleModal }: ModalProps) => {
     const [name, setName] = useState('');
@@ -30,23 +22,11 @@ const AddIngredientModal = ({visible, toggleModal }: ModalProps) => {
     const quantityInputRef = useRef<TextInput>(null);
 
     const handleAddIngredient = () => {
-        db.transaction((tx) => {
-          tx.executeSql(
-            'INSERT INTO ingredients (name, quantity) values (?, ?)',
-            [name, quantity],
-            (_, { rowsAffected, insertId }) => {
-              if (rowsAffected > 0) {
-                console.log(`Ingredient added with ID: ${insertId}`);
-                const newIngredient = { id: insertId || 0, name, quantity };
-                setIngredients([...ingredients, newIngredient]);
-                setName('');
-                setQuantity('');
-              }
-            }
-          );
-        });
-        ClearFields();
-        CheckFieldValues();
+      const newIngredient = new Ingredient(name, quantity);
+      AddIngredient(new Ingredient(name, quantity));
+      setIngredients([...ingredients, newIngredient]);
+      ClearFields();
+      CheckFieldValues();
     };
 
     // Clears all fields

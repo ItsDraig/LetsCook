@@ -2,32 +2,8 @@ import { React, useState, useRef, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native'
 
 import styles from './myrecipescard.style'
-import * as SQLite from 'expo-sqlite';
 import { FontAwesome } from '@expo/vector-icons'; 
 import RecipeModal from '../../../../app/recipe_modal'
-
-const rdb = SQLite.openDatabase('myrecipes.db');
-
-function getFirstColumnAsArray(db, table, column) {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(`SELECT ${column} FROM ${table}`, [], (tx, results) => {
-        const rows = results.rows;
-        const resultArray = [];
-
-        for (let i = 0; i < rows.length; i++) {
-          const { name } = rows.item(i); // extract the name property from the object
-          resultArray.push(name);
-        }
-
-        resolve(resultArray);
-      }, (error) => {
-        reject(error);
-      });
-    });
-  });
-}
-
 
 const MyRecipesCard = ({ item, handleCardPress}) => {
   const [size, setSize] = useState(85);

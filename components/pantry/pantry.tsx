@@ -6,107 +6,56 @@ import AddIngredientModal from '../../app/addingredient_modal';
 import PantryIngredientCard from '../common/cards/pantry/PantryIngredientCard';
 import CustomScrollBarDraggableFlatListHorizontal from '../common/CustomScrollBarDraggableFlatListHorizontal';
 import CustomScrollBarScrollViewVertical from "../common/CustomScrollBarScrollViewVertical"
-import * as SQLite from 'expo-sqlite';
-import { SQLError } from 'expo-sqlite';
 import { useFocusEffect } from '@react-navigation/native';
 
-const db = SQLite.openDatabase('ingredients.db');
-
 import styles from './pantry.style';
-
-type Ingredient = {
-  id: number;
-  name: string;
-  quantity: string;
-  handleDelete: (id : number) => void;
-};
+import { DeleteIngredient, GetIngredients } from '../../firebase';
+import { Ingredient } from '../../Ingredient';
 
 const Pantry = () => {
   const [ingredients, setIngredients] = useState([] as Ingredient[]);
   const [addIngredientModalVisible, setAddIngredientModalVisible] = useState(false);
+  const [refreshList, setRefreshList] = useState(false);
 
   const toggleAddIngredientModal = () => {
     console.log("toggling add ingredient modal");
     setAddIngredientModalVisible(!addIngredientModalVisible);
+    fetchIngredients();
+    setRefreshList(!refreshList);
   };
 
   useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS ingredients (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, quantity TEXT);'
-      );
-    });
-
     fetchIngredients();
   }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchIngredients();
-    }, [])
-  );
-
-  const fetchIngredients = () => {
+  const fetchIngredients = async () => {
     console.log('fetching ingredients');
-    db.transaction((tx) => {
-      tx.executeSql(
-        'SELECT * FROM ingredients',
-        [],
-        (_, result) => {
-          const len = result.rows.length;
-          if (len > 0) {
-            let ingredients = [];
-            for (let i = 0; i < len; i++) {
-              const row = result.rows.item(i);
-              const ingredient = {
-                id: row.id,
-                name: row.name,
-                quantity: row.quantity,
-                handleDelete: row.handleDelete
-              };
-              ingredients.push(ingredient);
-            }
-            setIngredients(ingredients);
-          }
-        },
-        (_, error: SQLError) => {
-          console.log(error);
-          return false;
-        }
-      );
-    });
+    const ingredientsList = await GetIngredients();
+    setIngredients(ingredientsList);
   };
 
-  const handleDelete = (id: number) => {
-    console.log('deleting ingredient with id: ' + id);
-    db.transaction(
-      (tx) => {
-        tx.executeSql('DELETE FROM ingredients WHERE id = ?', [id]);
-      },
-      undefined,
-      () => {
-        const newIngredients = ingredients.filter(
-          (ingredient) => ingredient.id !== id
-        );
-        setIngredients(newIngredients);
-      }
-    );
+  const handleDelete = (ingredientToDelete: Ingredient) => {
+    console.log('deleting ingredient with name: ' + ingredientToDelete.name);
+    DeleteIngredient(ingredientToDelete);
+    setRefreshList(true);
+    setRefreshList(false);
   };
 
   const platformChecker = () => {
     if (Platform.OS === 'web') {
       //return <CustomScrollBarDraggableFlatListHorizontal recipeList={ingredients} cardType={'PantryIngredientCard'}/>
       return  <CustomScrollBarScrollViewVertical style={{height: 600}}>
-                <FlatList data={ingredients}
-                  renderItem={({item}) => <PantryIngredientCard item={item} handleDelete={() => handleDelete(item.id)}/>}
-                  keyExtractor={(item, index) => index.toString()}
-                  contentContainerStyle={{ alignContent: 'center', columnGap: SIZES.xLarge }}
-                  columnWrapperStyle={{justifyContent: "space-between",}}
-                  numColumns={5}/>
-              </CustomScrollBarScrollViewVertical>
+        <FlatList data={ingredients}
+          extraData={refreshList}
+          renderItem={({item}) => <PantryIngredientCard item={item} handleDelete={() => handleDelete(item)}/>}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ alignContent: 'center', columnGap: SIZES.xLarge }}
+          columnWrapperStyle={{justifyContent: "space-between",}}
+          numColumns={5}/>
+      </CustomScrollBarScrollViewVertical>
     } else {
       return <FlatList data={ingredients}
-        renderItem={({item}) => <PantryIngredientCard item={item} handleDelete={() => handleDelete(item.id)}/>}
+        renderItem={({item}) => <PantryIngredientCard item={item} handleDelete={() => handleDelete(item)}/>}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={{ columnGap: SIZES.medium }}
         horizontal/>
